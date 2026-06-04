@@ -15,7 +15,7 @@ if __package__ in (None, ""):
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
-from src.config.settings import Settings
+from src.config.settings import Settings, local_spark_runtime_conf, prepare_local_spark_environment
 from src.observability.metrics_collector import build_pipeline_execution_metric
 from src.observability.pipeline_monitor import record_pipeline_metric
 from src.utils.logger import configure_logging, get_logger
@@ -80,10 +80,13 @@ def build_spark_session(
     resolved_app_name = app_name or active_settings.spark.app_name
     resolved_master = master or active_settings.spark.master
 
+    prepare_local_spark_environment(resolved_master)
     builder = SparkSession.builder.appName(resolved_app_name).master(resolved_master)
     for key, value in active_settings.spark_conf.items():
         if key in {"spark.app.name", "spark.master"}:
             continue
+        builder = builder.config(key, value)
+    for key, value in local_spark_runtime_conf(resolved_master).items():
         builder = builder.config(key, value)
 
     return builder.getOrCreate()

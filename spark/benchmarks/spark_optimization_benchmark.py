@@ -15,7 +15,7 @@ if __package__ in (None, ""):
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
-from src.config.settings import Settings
+from src.config.settings import Settings, local_spark_runtime_conf, prepare_local_spark_environment
 from src.utils.logger import configure_logging, get_logger
 
 LOGGER = get_logger(__name__)
@@ -114,10 +114,13 @@ def build_spark_session(
         else active_settings.spark.adaptive_query_execution
     )
 
+    prepare_local_spark_environment(resolved_master)
     builder = SparkSession.builder.appName(resolved_app_name).master(resolved_master)
     for key, value in active_settings.spark_conf.items():
         if key in {"spark.app.name", "spark.master"}:
             continue
+        builder = builder.config(key, value)
+    for key, value in local_spark_runtime_conf(resolved_master).items():
         builder = builder.config(key, value)
 
     builder = builder.config(

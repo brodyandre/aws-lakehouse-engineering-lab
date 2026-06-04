@@ -29,7 +29,7 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 - [Como Executar Localmente](#como-executar-localmente)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Competências Demonstradas](#competências-demonstradas)
-- [Requisito de Vaga x Demonstração no Projeto](#requisito-de-vaga-x-demonstração-no-projeto)
+- [Como Este Projeto Demonstra Requisitos de Vagas](#como-este-projeto-demonstra-requisitos-de-vagas)
 - [Evidências Esperadas](#evidências-esperadas)
 - [Roadmap](#roadmap)
 - [Limitações](#limitações)
@@ -105,6 +105,15 @@ Documentação complementar:
 - [Arquitetura detalhada](docs/architecture.md)
 - [Diagrama Mermaid](diagrams/architecture.md)
 
+<!--
+Screenshot sugerido: assets/screenshots/readme/01-readme-architecture-overview.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/01-readme-architecture-overview.png" alt="Visão geral da arquitetura local do AWS Lakehouse Engineering Lab" width="100%">
+</p>
+<p align="center"><em>Arquitetura local do laboratório com MinIO, PySpark, Airflow e camadas Raw, Bronze, Silver e Gold.</em></p>
+-->
+
 [⬆️ Voltar ao índice](#índice)
 
 <a id="stack-utilizada"></a>
@@ -159,6 +168,15 @@ Perguntas de negócio suportadas:
 - comportamento digital por canal e sessão.
 
 Mais detalhes em [docs/data-modeling.md](docs/data-modeling.md).
+
+<!--
+Screenshot sugerido: assets/screenshots/readme/02-readme-gold-star-schema-overview.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/02-readme-gold-star-schema-overview.png" alt="Visão da camada Gold e do modelo Star Schema do projeto" width="100%">
+</p>
+<p align="center"><em>Exemplo de visão da camada Gold com dimensões e fatos analíticos.</em></p>
+-->
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -219,6 +237,15 @@ Artefatos gerados:
 
 Mais detalhes em [docs/data-quality.md](docs/data-quality.md).
 
+<!--
+Screenshot sugerido: assets/screenshots/readme/03-readme-data-quality-report.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/03-readme-data-quality-report.png" alt="Relatório de Data Quality gerado pelo laboratório" width="100%">
+</p>
+<p align="center"><em>Relatório de qualidade de dados com regras aplicadas nas camadas Silver e Gold.</em></p>
+-->
+
 [⬆️ Voltar ao índice](#índice)
 
 <a id="observabilidade"></a>
@@ -241,6 +268,15 @@ Artefatos gerados:
 
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
+<!--
+Screenshot sugerido: assets/screenshots/readme/04-readme-observability-metrics.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
+</p>
+<p align="center"><em>Métricas de execução com duração, volume processado e status dos jobs.</em></p>
+-->
+
 [⬆️ Voltar ao índice](#índice)
 
 <a id="finops"></a>
@@ -261,6 +297,15 @@ Artefatos gerados:
 
 Mais detalhes em [docs/finops.md](docs/finops.md).
 
+<!--
+Screenshot sugerido: assets/screenshots/readme/05-readme-finops-cost-estimation.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/05-readme-finops-cost-estimation.png" alt="Estimativa local de custo e análise de small files" width="100%">
+</p>
+<p align="center"><em>Simulação local de FinOps com estimativas de storage, scan e economia por otimização.</em></p>
+-->
+
 [⬆️ Voltar ao índice](#índice)
 
 <a id="orquestração-com-airflow"></a>
@@ -277,6 +322,15 @@ Objetivos da orquestração:
 - tornar reexecução mais previsível;
 - evidenciar retries e status de tasks;
 - aproximar a experiência local do tipo de operação esperado em ambientes gerenciados.
+
+<!--
+Screenshot sugerido: assets/screenshots/readme/06-readme-airflow-dag.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
+</p>
+<p align="center"><em>Orquestração do pipeline completo no Airflow local.</em></p>
+-->
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -299,6 +353,15 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 - documentação temática em `docs/`;
 - scripts operacionais em `scripts/`;
 - `Makefile` para padronizar comandos recorrentes.
+
+<!--
+Screenshot sugerido: assets/screenshots/readme/07-readme-github-actions-workflows.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
+</p>
+<p align="center"><em>Validações automatizadas de lint, testes, YAML e Data Quality no GitHub Actions.</em></p>
+-->
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -358,6 +421,15 @@ Credenciais locais padrão:
 - Airflow senha: `admin`
 - MinIO usuário: `minioadmin`
 - MinIO senha: `minioadmin123`
+
+<!--
+Screenshot sugerido: assets/screenshots/readme/08-readme-local-services-overview.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
+</p>
+<p align="center"><em>Exemplo da stack local com Airflow, MinIO e Spark ativos.</em></p>
+-->
 
 ### Executando o pipeline por etapas
 
@@ -419,6 +491,15 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 4. despause a DAG, se necessário;
 5. acione uma execução manual.
 
+<!--
+Screenshot sugerido: assets/screenshots/readme/09-readme-airflow-run-success.png
+
+<p align="center">
+  <img src="assets/screenshots/readme/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
+</p>
+<p align="center"><em>Execução da DAG com tasks concluídas com sucesso.</em></p>
+-->
+
 [⬆️ Voltar ao índice](#índice)
 
 <a id="estrutura-do-projeto"></a>
@@ -427,6 +508,7 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 
 ```text
 aws-lakehouse-engineering-lab/
+├── assets/
 ├── airflow/
 ├── data/
 ├── diagrams/
@@ -479,9 +561,9 @@ aws-lakehouse-engineering-lab/
 
 [⬆️ Voltar ao índice](#índice)
 
-<a id="requisito-de-vaga-x-demonstração-no-projeto"></a>
+<a id="como-este-projeto-demonstra-requisitos-de-vagas"></a>
 
-## Requisito de Vaga x Demonstração no Projeto
+## Como Este Projeto Demonstra Requisitos de Vagas
 
 | Requisito de vaga | Como este projeto demonstra |
 | --- | --- |
@@ -513,6 +595,36 @@ Ao executar o laboratório, espera-se gerar evidências técnicas como:
 - datasets `Parquet` em `data/bronze`, `data/silver` e `data/gold`;
 - histórico de execução e dependências no Airflow;
 - validações automatizadas no GitHub Actions.
+
+### Guia para Inserção de Screenshots
+
+Para enriquecer o README sem poluir a narrativa, o ideal é usar de `6` a `9` capturas principais, sempre em `PNG`, com largura consistente e foco em uma mensagem por imagem.
+
+Pasta recomendada:
+
+- `assets/screenshots/readme/`
+
+Ordem sugerida de arquivos:
+
+| Ordem | Arquivo sugerido | Onde inserir | Objetivo visual |
+| --- | --- | --- | --- |
+| 1 | `01-readme-architecture-overview.png` | `Arquitetura` | Mostrar visão sistêmica do laboratório |
+| 2 | `02-readme-gold-star-schema-overview.png` | `Modelagem Analítica` | Evidenciar fatos e dimensões |
+| 3 | `03-readme-data-quality-report.png` | `Data Quality` | Mostrar regras e evidências de qualidade |
+| 4 | `04-readme-observability-metrics.png` | `Observabilidade` | Mostrar métricas operacionais |
+| 5 | `05-readme-finops-cost-estimation.png` | `FinOps` | Mostrar custo simulado e small files |
+| 6 | `06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar a DAG e o encadeamento |
+| 7 | `07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
+| 8 | `08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
+| 9 | `09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida |
+
+Como usar:
+
+1. capture a tela com foco em legibilidade;
+2. recorte bordas e elementos irrelevantes;
+3. salve o arquivo com o nome sugerido em `assets/screenshots/readme/`;
+4. localize no README o bloco comentado `Screenshot sugerido: ...`;
+5. remova os delimitadores `<!--` e `-->` para publicar a imagem.
 
 [⬆️ Voltar ao índice](#índice)
 

@@ -49,6 +49,10 @@ def _project_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def _is_local_spark_master(master: str | None) -> bool:
+    return bool(master) and str(master).strip().lower().startswith("local")
+
+
 if load_dotenv is not None:
     load_dotenv(_project_root() / ".env", override=False)
 
@@ -248,11 +252,42 @@ class Settings:
 settings = Settings()
 
 
+def local_spark_runtime_env(master: str | None) -> dict[str, str]:
+    if not _is_local_spark_master(master):
+        return {}
+
+    local_ip = _get_env(("SPARK_LOCAL_IP",), "127.0.0.1")
+    local_hostname = _get_env(("SPARK_LOCAL_HOSTNAME",), "localhost")
+    return {
+        "SPARK_LOCAL_IP": local_ip,
+        "SPARK_LOCAL_HOSTNAME": local_hostname,
+    }
+
+
+def local_spark_runtime_conf(master: str | None) -> dict[str, str]:
+    if not _is_local_spark_master(master):
+        return {}
+
+    local_ip = _get_env(("SPARK_LOCAL_IP",), "127.0.0.1")
+    return {
+        "spark.driver.host": local_ip,
+        "spark.driver.bindAddress": "127.0.0.1",
+    }
+
+
+def prepare_local_spark_environment(master: str | None) -> None:
+    for key, value in local_spark_runtime_env(master).items():
+        os.environ.setdefault(key, value)
+
+
 __all__ = [
     "MinIOSettings",
     "Settings",
     "SparkSettings",
     "VALID_LAYERS",
     "VALID_REPORT_CATEGORIES",
+    "local_spark_runtime_conf",
+    "local_spark_runtime_env",
+    "prepare_local_spark_environment",
     "settings",
 ]

@@ -7,7 +7,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+DEFAULT_PYTHON_BIN="python3"
+if [[ -x ".venv/bin/python" ]]; then
+  DEFAULT_PYTHON_BIN=".venv/bin/python"
+fi
+PYTHON_BIN="${PYTHON_BIN:-${DEFAULT_PYTHON_BIN}}"
 REPORT_PATH="${REPORT_PATH:-reports/final_project_report.md}"
 
 timestamp() {

@@ -14,7 +14,11 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+DEFAULT_PYTHON_BIN="python3"
+if [[ -x ".venv/bin/python" ]]; then
+  DEFAULT_PYTHON_BIN=".venv/bin/python"
+fi
+PYTHON_BIN="${PYTHON_BIN:-${DEFAULT_PYTHON_BIN}}"
 SPARK_MASTER_VALUE="${PIPELINE_SPARK_MASTER:-${SPARK_MASTER:-local[*]}}"
 
 CUSTOMERS_COUNT="${PIPELINE_CUSTOMERS:-200}"
