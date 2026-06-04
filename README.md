@@ -106,7 +106,7 @@ Documentação complementar:
 - [Diagrama Mermaid](diagrams/architecture.md)
 
 <p align="center">
-  <img src="assets/screenshots/readme/01-readme-architecture-overview.png" alt="Visão geral da arquitetura local do AWS Lakehouse Engineering Lab" width="100%">
+  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" alt="Visão geral da arquitetura local do AWS Lakehouse Engineering Lab" width="100%">
 </p>
 <p align="center"><em>Arquitetura local do laboratório com MinIO, PySpark, Airflow e camadas Raw, Bronze, Silver e Gold.</em></p>
 
@@ -167,7 +167,7 @@ Perguntas de negócio suportadas:
 Mais detalhes em [docs/data-modeling.md](docs/data-modeling.md).
 
 <p align="center">
-  <img src="assets/screenshots/readme/02-readme-gold-star-schema-overview.png" alt="Visão da camada Gold e do modelo Star Schema do projeto" width="100%">
+  <img src="assets/screenshots/readme/modeling/02-readme-gold-star-schema-overview.png" alt="Visão da camada Gold e do modelo Star Schema do projeto" width="100%">
 </p>
 <p align="center"><em>Exemplo de visão da camada Gold com dimensões e fatos analíticos.</em></p>
 
@@ -232,7 +232,7 @@ Artefatos gerados:
 Mais detalhes em [docs/data-quality.md](docs/data-quality.md).
 
 <p align="center">
-  <img src="assets/screenshots/readme/03-readme-data-quality-report.png" alt="Relatório de Data Quality gerado pelo laboratório" width="100%">
+  <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" alt="Relatório de Data Quality gerado pelo laboratório" width="100%">
 </p>
 <p align="center"><em>Relatório de qualidade de dados com regras aplicadas nas camadas Silver e Gold.</em></p>
 
@@ -260,7 +260,7 @@ Artefatos gerados:
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
 <p align="center">
-  <img src="assets/screenshots/readme/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
+  <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
 </p>
 <p align="center"><em>Métricas de execução com duração, volume processado e status dos jobs.</em></p>
 
@@ -286,7 +286,7 @@ Artefatos gerados:
 Mais detalhes em [docs/finops.md](docs/finops.md).
 
 <p align="center">
-  <img src="assets/screenshots/readme/05-readme-finops-cost-estimation.png" alt="Estimativa local de custo e análise de small files" width="100%">
+  <img src="assets/screenshots/readme/finops/05-readme-finops-cost-estimation.png" alt="Estimativa local de custo e análise de small files" width="100%">
 </p>
 <p align="center"><em>Simulação local de FinOps com estimativas de storage, scan e economia por otimização.</em></p>
 
@@ -309,7 +309,7 @@ Objetivos da orquestração:
 - aproximar a experiência local do tipo de operação esperado em ambientes gerenciados.
 
 <p align="center">
-  <img src="assets/screenshots/readme/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
+  <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
 </p>
 <p align="center"><em>Orquestração do pipeline completo no Airflow local.</em></p>
 
@@ -337,7 +337,7 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 - `Makefile` para padronizar comandos recorrentes.
 
 <p align="center">
-  <img src="assets/screenshots/readme/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
+  <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
 </p>
 <p align="center"><em>Validações automatizadas de lint, testes, YAML e Data Quality no GitHub Actions.</em></p>
 
@@ -402,7 +402,7 @@ Credenciais locais padrão:
 - MinIO senha: `minioadmin123`
 
 <p align="center">
-  <img src="assets/screenshots/readme/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
+  <img src="assets/screenshots/readme/runtime/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
 </p>
 <p align="center"><em>Exemplo da stack local com Airflow, MinIO e Spark ativos.</em></p>
 
@@ -468,7 +468,7 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 5. acione uma execução manual.
 
 <p align="center">
-  <img src="assets/screenshots/readme/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
+  <img src="assets/screenshots/readme/orchestration/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
 </p>
 <p align="center"><em>Execução da DAG com tasks concluídas com sucesso.</em></p>
 
@@ -507,6 +507,7 @@ aws-lakehouse-engineering-lab/
 - `spark/benchmarks/`: benchmark de otimização Spark;
 - `airflow/dags/`: orquestração do pipeline;
 - `docs/`: documentação temática e ADRs;
+- `assets/screenshots/readme/`: evidências visuais do README organizadas por tema;
 - `sql/`: DDL, analytics e data marts;
 - `tests/`: testes unitários, integração e Data Quality.
 
@@ -577,27 +578,41 @@ Pasta recomendada:
 
 - `assets/screenshots/readme/`
 
+Hierarquia sugerida:
+
+```text
+assets/screenshots/readme/
+├── architecture/
+├── cicd/
+├── data-quality/
+├── finops/
+├── modeling/
+├── observability/
+├── orchestration/
+└── runtime/
+```
+
 Ordem sugerida de arquivos:
 
 | Ordem | Arquivo sugerido | Onde inserir | Objetivo visual |
 | --- | --- | --- | --- |
-| 1 | `01-readme-architecture-overview.png` | `Arquitetura` | Mostrar visão sistêmica do laboratório |
-| 2 | `02-readme-gold-star-schema-overview.png` | `Modelagem Analítica` | Evidenciar fatos e dimensões |
-| 3 | `03-readme-data-quality-report.png` | `Data Quality` | Mostrar regras e evidências de qualidade |
-| 4 | `04-readme-observability-metrics.png` | `Observabilidade` | Mostrar métricas operacionais |
-| 5 | `05-readme-finops-cost-estimation.png` | `FinOps` | Mostrar custo simulado e small files |
-| 6 | `06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar a DAG e o encadeamento |
-| 7 | `07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
-| 8 | `08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
-| 9 | `09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida |
+| 1 | `architecture/01-readme-architecture-overview.png` | `Arquitetura` | Mostrar visão sistêmica do laboratório |
+| 2 | `modeling/02-readme-gold-star-schema-overview.png` | `Modelagem Analítica` | Evidenciar fatos e dimensões |
+| 3 | `data-quality/03-readme-data-quality-report.png` | `Data Quality` | Mostrar regras e evidências de qualidade |
+| 4 | `observability/04-readme-observability-metrics.png` | `Observabilidade` | Mostrar métricas operacionais |
+| 5 | `finops/05-readme-finops-cost-estimation.png` | `FinOps` | Mostrar custo simulado e small files |
+| 6 | `orchestration/06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar a DAG e o encadeamento |
+| 7 | `cicd/07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
+| 8 | `runtime/08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
+| 9 | `orchestration/09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida |
 
 Como usar:
 
 1. capture a tela com foco em legibilidade;
 2. recorte bordas e elementos irrelevantes;
-3. salve o arquivo com o nome sugerido em `assets/screenshots/readme/`;
-4. localize no README o bloco comentado `Screenshot sugerido: ...`;
-5. remova os delimitadores `<!--` e `-->` para publicar a imagem.
+3. salve o arquivo com o nome sugerido dentro da subpasta temática correspondente;
+4. ajuste o `src` da imagem no README quando trocar o arquivo ou adicionar uma nova evidência;
+5. mantenha nomes previsíveis para facilitar manutenção e navegação no GitHub.
 
 [⬆️ Voltar ao índice](#índice)
 
