@@ -2,7 +2,7 @@ PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 COMPOSE ?= docker compose
 PYTHON_SOURCES := $(shell find src spark airflow tests -type f -name '*.py' | sort)
 
-.PHONY: help bootstrap setup-dev init up down restart logs ps check run-local clean-outputs final-report lint format test smoke clean
+.PHONY: help bootstrap setup-dev init up down restart logs ps check run-local clean-outputs final-report sync-readme-screenshots lint format test smoke clean
 
 help:
 	@printf "Targets disponíveis:\n"
@@ -17,6 +17,7 @@ help:
 	@printf "  make ps         - lista os serviços\n"
 	@printf "  make run-local  - executa o pipeline ponta a ponta fora do Airflow\n"
 	@printf "  make final-report - consolida o relatório final do projeto\n"
+	@printf "  make sync-readme-screenshots - ativa screenshots no README quando os arquivos existirem\n"
 	@printf "  make clean-outputs - limpa dados e relatórios gerados\n"
 	@printf "  make lint       - executa checagens de estilo\n"
 	@printf "  make format     - formata o código Python\n"
@@ -57,6 +58,9 @@ run-local:
 
 final-report:
 	bash scripts/generate_final_report.sh
+
+sync-readme-screenshots:
+	$(PYTHON) scripts/enable_readme_screenshots.py
 
 clean-outputs:
 	bash scripts/clean_outputs.sh
