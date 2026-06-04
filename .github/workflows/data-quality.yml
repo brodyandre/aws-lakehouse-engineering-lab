@@ -1,0 +1,100 @@
+name: data-quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  data-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PYTHONPATH: .
+      SPARK_LOCAL_IP: 127.0.0.1
+      SPARK_MASTER: local[2]
+      SPARK_SHUFFLE_PARTITIONS: 4
+      SPARK_ADAPTIVE_QUERY_EXECUTION: "true"
+      SPARK_TIMEZONE: UTC
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Set up Java for PySpark
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare local report directories
+        run: |
+          mkdir -p reports/pipeline_runs reports/data_quality reports/observability reports/finops
+
+      - name: Generate reduced synthetic data
+        run: |
+          python src/ingestion/generate_synthetic_data.py \
+            --customers 30 \
+            --products 12 \
+            --campaigns 4 \
+            --orders 50 \
+            --order-items 90 \
+            --web-events 120 \
+            --max-items-per-order 4 \
+            --seed 42 \
+            --output-dir data/raw
+
+      - name: Run raw to bronze
+        run: |
+          python spark/jobs/raw_to_bronze.py \
+            --raw-dir data/raw \
+            --bronze-dir data/bronze \
+            --report-path reports/pipeline_runs/raw_to_bronze_report.md \
+            --observability-json-path reports/observability/pipeline_metrics.json \
+            --observability-markdown-path reports/observability/pipeline_metrics.md \
+            --master local[2]
+
+      - name: Run bronze to silver
+        run: |
+          python spark/jobs/bronze_to_silver.py \
+            --bronze-dir data/bronze \
+            --silver-dir data/silver \
+            --report-path reports/pipeline_runs/bronze_to_silver_report.md \
+            --observability-json-path reports/observability/pipeline_metrics.json \
+            --observability-markdown-path reports/observability/pipeline_metrics.md \
+            --master local[2]
+
+      - name: Run silver to gold
+        run: |
+          python spark/jobs/silver_to_gold.py \
+            --silver-dir data/silver \
+            --gold-dir data/gold \
+            --report-path reports/pipeline_runs/silver_to_gold_report.md \
+            --observability-json-path reports/observability/pipeline_metrics.json \
+            --observability-markdown-path reports/observability/pipeline_metrics.md \
+            --master local[2]
+
+      - name: Execute data quality checks
+        run: |
+          python src/quality/data_quality_checks.py \
+            --silver-dir data/silver \
+            --gold-dir data/gold \
+            --report-path reports/data_quality/data_quality_report.md \
+            --json-path reports/data_quality/data_quality_results.json \
+            --master local[2]
+
+      - name: Run data quality tests
+        run: python -m pytest -q tests/data_quality

@@ -1,0 +1,88 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.python-version
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Test and lint caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Environment files
+.env
+.env.local
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs and runtime artifacts
+*.log
+*.out
+*.err
+*.pid
+*.seed
+logs/
+tmp/
+.tmp/
+
+# Docker
+.docker/
+docker-data/
+*.tar
+
+# Airflow
+airflow/logs/
+airflow/plugins/
+airflow/airflow.cfg
+airflow/airflow.db
+airflow/webserver_config.py
+airflow/standalone_admin_password.txt
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+spark-events/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated data
+data/raw/*
+!data/raw/.gitkeep
+data/bronze/*
+!data/bronze/.gitkeep
+data/silver/*
+!data/silver/.gitkeep
+data/gold/*
+!data/gold/.gitkeep
+
+# Generated reports
+reports/final_project_report.md
+reports/pipeline_runs/*
+!reports/pipeline_runs/.gitkeep
+reports/data_quality/*
+!reports/data_quality/.gitkeep
+reports/finops/*
+!reports/finops/.gitkeep
+!reports/finops/README.md
+reports/observability/*
+!reports/observability/.gitkeep
