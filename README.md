@@ -105,14 +105,11 @@ Documentação complementar:
 - [Arquitetura detalhada](docs/architecture.md)
 - [Diagrama Mermaid](diagrams/architecture.md)
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/01-readme-architecture-overview.png
-
 <p align="center">
   <img src="assets/screenshots/readme/01-readme-architecture-overview.png" alt="Visão geral da arquitetura local do AWS Lakehouse Engineering Lab" width="100%">
 </p>
 <p align="center"><em>Arquitetura local do laboratório com MinIO, PySpark, Airflow e camadas Raw, Bronze, Silver e Gold.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -169,14 +166,11 @@ Perguntas de negócio suportadas:
 
 Mais detalhes em [docs/data-modeling.md](docs/data-modeling.md).
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/02-readme-gold-star-schema-overview.png
-
 <p align="center">
   <img src="assets/screenshots/readme/02-readme-gold-star-schema-overview.png" alt="Visão da camada Gold e do modelo Star Schema do projeto" width="100%">
 </p>
 <p align="center"><em>Exemplo de visão da camada Gold com dimensões e fatos analíticos.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -237,14 +231,11 @@ Artefatos gerados:
 
 Mais detalhes em [docs/data-quality.md](docs/data-quality.md).
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/03-readme-data-quality-report.png
-
 <p align="center">
   <img src="assets/screenshots/readme/03-readme-data-quality-report.png" alt="Relatório de Data Quality gerado pelo laboratório" width="100%">
 </p>
 <p align="center"><em>Relatório de qualidade de dados com regras aplicadas nas camadas Silver e Gold.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -268,14 +259,11 @@ Artefatos gerados:
 
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/04-readme-observability-metrics.png
-
 <p align="center">
   <img src="assets/screenshots/readme/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
 </p>
 <p align="center"><em>Métricas de execução com duração, volume processado e status dos jobs.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -297,14 +285,11 @@ Artefatos gerados:
 
 Mais detalhes em [docs/finops.md](docs/finops.md).
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/05-readme-finops-cost-estimation.png
-
 <p align="center">
   <img src="assets/screenshots/readme/05-readme-finops-cost-estimation.png" alt="Estimativa local de custo e análise de small files" width="100%">
 </p>
 <p align="center"><em>Simulação local de FinOps com estimativas de storage, scan e economia por otimização.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -323,14 +308,11 @@ Objetivos da orquestração:
 - evidenciar retries e status de tasks;
 - aproximar a experiência local do tipo de operação esperado em ambientes gerenciados.
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/06-readme-airflow-dag.png
-
 <p align="center">
   <img src="assets/screenshots/readme/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
 </p>
 <p align="center"><em>Orquestração do pipeline completo no Airflow local.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -354,14 +336,11 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 - scripts operacionais em `scripts/`;
 - `Makefile` para padronizar comandos recorrentes.
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/07-readme-github-actions-workflows.png
-
 <p align="center">
   <img src="assets/screenshots/readme/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
 </p>
 <p align="center"><em>Validações automatizadas de lint, testes, YAML e Data Quality no GitHub Actions.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -422,14 +401,11 @@ Credenciais locais padrão:
 - MinIO usuário: `minioadmin`
 - MinIO senha: `minioadmin123`
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/08-readme-local-services-overview.png
-
 <p align="center">
   <img src="assets/screenshots/readme/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
 </p>
 <p align="center"><em>Exemplo da stack local com Airflow, MinIO e Spark ativos.</em></p>
--->
+
 
 ### Executando o pipeline por etapas
 
@@ -491,14 +467,11 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 4. despause a DAG, se necessário;
 5. acione uma execução manual.
 
-<!--
-Screenshot sugerido: assets/screenshots/readme/09-readme-airflow-run-success.png
-
 <p align="center">
   <img src="assets/screenshots/readme/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
 </p>
 <p align="center"><em>Execução da DAG com tasks concluídas com sucesso.</em></p>
--->
+
 
 [⬆️ Voltar ao índice](#índice)
 
