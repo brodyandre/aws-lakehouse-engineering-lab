@@ -275,11 +275,6 @@ Artefatos gerados:
 
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
-<p align="center">
-  <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
-</p>
-<p align="center"><em>Métricas de execução com duração, volume processado e status dos jobs.</em></p>
-
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -327,7 +322,7 @@ Objetivos da orquestração:
 <p align="center">
   <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
 </p>
-<p align="center"><em>Orquestração do pipeline completo no Airflow local.</em></p>
+<p align="center"><em>Resumo da DAG no Airflow local, com status das tasks e visão operacional da execução.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -355,7 +350,7 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 <p align="center">
   <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
 </p>
-<p align="center"><em>Validações automatizadas de lint, testes, YAML e Data Quality no GitHub Actions.</em></p>
+<p align="center"><em>Exemplo de execução bem-sucedida de um workflow de validação no GitHub Actions.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
