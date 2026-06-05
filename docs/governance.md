@@ -83,7 +83,7 @@ Isso ajuda a evitar que a camada Gold seja tratada como confiável sem evidênci
 
 ## Dados sensíveis e uso de PII
 
-Este laboratório usa dados sintéticos. Ainda assim, ele adota um princípio importante: não trabalhar com dados reais desnecessários quando o objetivo é aprendizado, portfólio ou demonstração técnica.
+Este laboratório usa dados sintéticos. Ainda assim, ele adota um princípio importante: não trabalhar com dados reais desnecessários quando o objetivo é aprendizado ou demonstração técnica.
 
 Diretrizes:
 
