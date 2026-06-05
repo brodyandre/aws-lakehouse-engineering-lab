@@ -275,6 +275,11 @@ Artefatos gerados:
 
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
+<p align="center">
+  <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
+</p>
+<p align="center"><em>Métricas consolidadas de execução com status, duração, volumes processados e artefatos gerados por job.</em></p>
+
 
 [⬆️ Voltar ao índice](#índice)
 
