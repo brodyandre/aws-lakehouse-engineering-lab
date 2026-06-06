@@ -34,7 +34,7 @@ Os workflows foram desenhados para funcionar sem secrets e sem integração com 
 - Usar uma pipeline monolítica única.
   - Rejeitada por dificultar leitura, manutenção e feedback rápido.
 - Usar outra plataforma de CI.
-  - Rejeitada por menor aderência ao objetivo de portfólio público simples e acessível.
+  - Rejeitada por menor aderência ao objetivo de documentação pública simples e acessível.
 
 ## Consequências positivas
 

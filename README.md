@@ -18,6 +18,7 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 - [Arquitetura](#arquitetura)
 - [Stack Utilizada](#stack-utilizada)
 - [Camadas do Lakehouse](#camadas-do-lakehouse)
+- [Como Interpretar Bronze, Silver e Gold](#como-interpretar-bronze-silver-e-gold)
 - [Modelagem Analítica](#modelagem-analítica)
 - [Camada de Query](#camada-de-query)
 - [Pipeline de Dados](#pipeline-de-dados)
@@ -28,9 +29,10 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 - [Orquestração com Airflow](#orquestração-com-airflow)
 - [CI/CD com GitHub Actions](#cicd-com-github-actions)
 - [Como Executar Localmente](#como-executar-localmente)
+- [Troubleshooting](#troubleshooting)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Competências Demonstradas](#competências-demonstradas)
-- [Como Este Projeto Demonstra Requisitos de Vagas](#como-este-projeto-demonstra-requisitos-de-vagas)
+- [Mapeamento Técnico da Solução](#mapeamento-tecnico-da-solucao)
 - [Evidências Esperadas](#evidências-esperadas)
 - [Roadmap](#roadmap)
 - [Limitações](#limitações)
@@ -43,7 +45,7 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 
 `aws-lakehouse-engineering-lab` demonstra como estruturar um pipeline analítico moderno em um laboratório reproduzível e local-first. O foco do projeto é mostrar organização por camadas, modelagem dimensional, processamento distribuído, governança mínima, automação e rastreabilidade operacional de forma honesta, sem afirmar uso produtivo de AWS, Databricks ou ambientes corporativos reais.
 
-O laboratório foi pensado para recrutadores, líderes técnicos e profissionais de dados que queiram avaliar capacidade de arquitetura, implementação e documentação em um projeto consistente de portfólio.
+O laboratório foi pensado para leitura técnica estruturada, demonstração prática da solução e avaliação objetiva de arquitetura, implementação e documentação.
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -149,6 +151,20 @@ Documentação complementar:
 | `Bronze` | Padronização estrutural mínima | Conversão para `Parquet`, colunas técnicas e rastreabilidade |
 | `Silver` | Conformidade e qualidade | Tipagem, padronização, sinalização de inválidos e regras de negócio |
 | `Gold` | Consumo analítico | Fatos, dimensões, métricas e consultas de negócio |
+
+[⬆️ Voltar ao índice](#índice)
+
+<a id="como-interpretar-bronze-silver-e-gold"></a>
+
+## Como Interpretar Bronze, Silver e Gold
+
+Neste laboratório, `Bronze`, `Silver` e `Gold` representam a evolução dos dados ao longo do pipeline, não níveis de senioridade ou maturidade do projeto.
+
+- **Bronze**: primeira camada confiável para trabalho analítico, com dados já convertidos para `Parquet` e rastreáveis por processamento.
+- **Silver**: camada em que os dados passam por padronização, tipagem, regras de negócio e sinais de qualidade.
+- **Gold**: camada voltada para consumo analítico, com fatos, dimensões e métricas organizadas para consultas e reporting.
+
+Essa distinção ajuda a comunicar com clareza onde cada transformação acontece e por que cada camada existe dentro do fluxo Lakehouse.
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -306,7 +322,7 @@ Mais detalhes em [docs/observability.md](docs/observability.md).
 <p align="center">
   <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Painel de observabilidade com resumo e métricas das últimas execuções do pipeline local" width="100%">
 </p>
-<p align="center"><em>Resumo operacional das últimas execuções com status, duração, volume processado, inválidos e percentual válido.</em></p>
+<p align="center"><em>Resumo operacional das últimas execuções com status, duração, volumes processados, inválidos e artefatos gerados por job.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -355,7 +371,7 @@ Objetivos da orquestração:
 <p align="center">
   <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" alt="DAG do Airflow para o pipeline lakehouse local" width="100%">
 </p>
-<p align="center"><em>Orquestração do pipeline completo no Airflow local.</em></p>
+<p align="center"><em>Resumo da DAG no Airflow local, com status das tasks e visão operacional da execução.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -383,7 +399,7 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 <p align="center">
   <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
 </p>
-<p align="center"><em>Validações automatizadas de lint, testes, YAML e Data Quality no GitHub Actions.</em></p>
+<p align="center"><em>Exemplo de execução bem-sucedida de um workflow de validação no GitHub Actions.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -558,6 +574,85 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 
 [⬆️ Voltar ao índice](#índice)
 
+<a id="troubleshooting"></a>
+
+## Troubleshooting
+
+Alguns problemas recorrentes neste laboratório e como diagnosticá-los rapidamente:
+
+### 1. `make check` falha logo no início
+
+Esse cenário normalmente indica ausência de dependências locais, problemas no `.env` ou falta de `Java` para os jobs Spark.
+
+Comandos úteis:
+
+```bash
+make check
+make setup-dev
+python3 --version
+java -version
+```
+
+### 2. Os containers sobem parcialmente ou algum serviço fica indisponível
+
+Quando Airflow, MinIO ou Postgres não sobem corretamente, vale olhar o estado dos serviços e os logs do Compose antes de tentar reexecutar o pipeline.
+
+Comandos úteis:
+
+```bash
+make ps
+docker compose logs --tail=200 postgres minio airflow-webserver airflow-scheduler
+```
+
+### 3. A DAG não aparece no Airflow ou não executa como esperado
+
+Se a interface abre, mas a DAG `lakehouse_pipeline_dag` não aparece ou falha cedo, o primeiro passo é conferir a inicialização do Airflow e listar as DAGs carregadas.
+
+Comandos úteis:
+
+```bash
+docker compose logs --tail=200 airflow-init
+docker compose exec airflow-webserver airflow dags list
+```
+
+### 4. Jobs PySpark falham em execução local
+
+Na maior parte dos casos, isso está ligado a `Java`, variáveis de ambiente ou diferenças entre a execução local e o ambiente do container.
+
+Comandos úteis:
+
+```bash
+make check
+docker compose exec airflow-webserver env | grep SPARK_MASTER_URL
+docker compose exec airflow-webserver python3 --version
+```
+
+### 5. Relatórios ou datasets não são gerados como esperado
+
+Se os artefatos em `reports/` ou os dados em `data/` ficam inconsistentes após várias execuções, é melhor limpar as saídas e rodar o pipeline novamente de forma controlada.
+
+Comandos úteis:
+
+```bash
+make clean-outputs
+make run-local
+make final-report
+```
+
+### 6. Um workflow do GitHub Actions falha, mas localmente parece tudo certo
+
+O caminho mais prático é reproduzir localmente os mesmos blocos de validação usados no repositório.
+
+Comandos úteis:
+
+```bash
+make lint
+make test
+make smoke
+```
+
+[⬆️ Voltar ao índice](#índice)
+
 <a id="estrutura-do-projeto"></a>
 
 ## Estrutura do Projeto
@@ -625,11 +720,11 @@ aws-lakehouse-engineering-lab/
 
 [⬆️ Voltar ao índice](#índice)
 
-<a id="como-este-projeto-demonstra-requisitos-de-vagas"></a>
+<a id="mapeamento-tecnico-da-solucao"></a>
 
-## Como Este Projeto Demonstra Requisitos de Vagas
+## Mapeamento Técnico da Solução
 
-| Requisito de vaga | Como este projeto demonstra |
+| Capacidade técnica | Como o projeto cobre |
 | --- | --- |
 | Experiência com arquitetura de dados em nuvem AWS | Simula localmente um Lakehouse inspirado em AWS usando MinIO como object storage S3-compatible, camadas Bronze/Silver/Gold e documentação arquitetural. |
 | Conhecimento em Data Lake / Lakehouse | Estrutura o pipeline em camadas com responsabilidades claras, rastreabilidade e dados analíticos materializados em Parquet. |
@@ -694,10 +789,10 @@ Ordem sugerida de arquivos:
 | 3 | `data-quality/03-readme-data-quality-report.png` | `Data Quality` | Mostrar regras e evidências de qualidade |
 | 4 | `observability/04-readme-observability-metrics.png` | `Observabilidade` | Mostrar métricas operacionais |
 | 5 | `finops/05-readme-finops-cost-estimation.png` | `FinOps` | Mostrar custo simulado e small files |
-| 6 | `orchestration/06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar a DAG e o encadeamento |
+| 6 | `orchestration/06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar resumo operacional da DAG e status da execução |
 | 7 | `cicd/07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
 | 8 | `runtime/08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
-| 9 | `orchestration/09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida |
+| 9 | `orchestration/09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida com tasks concluídas |
 | 10 | `query/10-readme-trino-query-serving.png` | `Camada de Query` | Mostrar a camada analítica publicada via Trino |
 
 Como usar:

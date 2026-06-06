@@ -196,4 +196,4 @@ O laboratório não pretende reproduzir:
 - observabilidade distribuída com telemetria centralizada;
 - maturidade completa de produção.
 
-O objetivo é ser um ambiente de aprendizado aplicado, portfólio e demonstração de raciocínio arquitetural.
+O objetivo é ser um ambiente de aprendizado aplicado, documentação e demonstração de raciocínio arquitetural.

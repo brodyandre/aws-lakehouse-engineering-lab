@@ -35,7 +35,7 @@ O nome vem do formato visual: uma fato central cercada por dimensões.
 | Critério | Motivo da escolha |
 | --- | --- |
 | Simplicidade de consulta | menos complexidade para receita, clientes, produtos e campanhas |
-| Boa comunicação com BI | padrão reconhecido por recrutadores e times analíticos |
+| Boa comunicação com BI | padrão reconhecido por times analíticos e leitores técnicos |
 | Facilidade de agregação | fatos e dimensões se conectam de forma direta |
 | Compatibilidade com o laboratório | combina bem com a Silver conformada e com consultas SQL simples |
 
@@ -117,7 +117,7 @@ Motivos:
 
 - o objetivo principal é consumo analítico e demonstração didática;
 - o escopo do projeto favorece legibilidade e velocidade de entendimento;
-- Star Schema comunica melhor a intenção para recrutadores e times de BI;
+- Star Schema comunica melhor a intenção para times de BI e leitores técnicos;
 - Data Vault adicionaria complexidade além do necessário para este caso de uso.
 
 ## Papel de cada camada até a Gold

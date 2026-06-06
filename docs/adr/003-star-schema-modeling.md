@@ -9,7 +9,7 @@ Aceito
 A camada Gold do laboratório precisa demonstrar capacidade analítica, clareza semântica e boa comunicação com públicos técnicos e de negócio. Como o cenário do projeto envolve clientes, produtos, campanhas, pedidos e eventos digitais, era necessário escolher um modelo que equilibrasse:
 
 - simplicidade de consulta;
-- boa narrativa para portfólio;
+- boa narrativa técnica e documentação clara;
 - aderência a práticas reconhecidas de analytics engineering;
 - compatibilidade com perguntas de negócio como receita por categoria, mês e campanha.
 
@@ -38,7 +38,7 @@ Essa decisão materializa:
 - Consultas analíticas ficam mais simples e legíveis.
 - O projeto demonstra um padrão amplamente reconhecido em BI e engenharia de dados.
 - O modelo facilita benchmarking, validações de qualidade e exemplos de SQL analítico.
-- A camada Gold fica mais fácil de explicar em contextos de entrevista e portfólio.
+- A camada Gold fica mais fácil de explicar em documentação e discussões técnicas.
 
 ## Trade-offs
 

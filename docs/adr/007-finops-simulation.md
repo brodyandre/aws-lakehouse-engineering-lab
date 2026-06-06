@@ -37,7 +37,7 @@ Adotar um modelo de `FinOps simulado`, baseado no tamanho e na quantidade dos ar
 
 - O projeto passa a discutir custo como atributo de arquitetura.
 - A simulação ajuda a explicar por que Parquet, partição e compactação importam.
-- O laboratório fica mais completo para entrevistas e portfólio.
+- O laboratório fica mais completo para avaliação técnica e documentação.
 - O modelo é legível e ajustável sem dependência externa.
 
 ## Trade-offs

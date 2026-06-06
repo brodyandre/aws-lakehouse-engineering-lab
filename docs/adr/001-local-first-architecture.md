@@ -6,14 +6,14 @@ Aceito
 
 ## Contexto
 
-O objetivo do projeto é demonstrar boas práticas de arquitetura Lakehouse sem depender de conta cloud, billing real, credenciais sensíveis ou serviços pagos. Além disso, o laboratório precisa ser reproduzível por recrutadores, estudantes e profissionais técnicos em uma máquina comum de desenvolvimento.
+O objetivo do projeto é demonstrar boas práticas de arquitetura Lakehouse sem depender de conta cloud, billing real, credenciais sensíveis ou serviços pagos. Além disso, o laboratório precisa ser reproduzível por profissionais técnicos em uma máquina comum de desenvolvimento.
 
 Havia, portanto, uma necessidade clara de escolher uma abordagem que priorizasse:
 
 - baixo custo de adoção;
 - facilidade de execução local;
 - capacidade de simular conceitos relevantes da AWS;
-- boa legibilidade arquitetural para fins de portfólio;
+- boa legibilidade arquitetural para documentação e estudo;
 - independência de infraestrutura externa.
 
 ## Decisão
@@ -41,7 +41,7 @@ Essa decisão organiza o projeto em torno de:
 
 - O projeto pode ser executado sem custo de cloud.
 - A experiência é reproduzível em ambiente local controlado.
-- A arquitetura fica mais acessível para estudo, demonstração e entrevistas técnicas.
+- A arquitetura fica mais acessível para estudo, demonstração e discussões técnicas.
 - O laboratório evidencia preocupação com arquitetura completa, não apenas com scripts isolados.
 
 ## Trade-offs
