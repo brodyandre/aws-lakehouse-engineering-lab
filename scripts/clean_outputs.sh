@@ -38,10 +38,12 @@ main() {
   clean_directory_contents "data/bronze"
   clean_directory_contents "data/silver"
   clean_directory_contents "data/gold"
+  clean_directory_contents "data/serving"
   clean_directory_contents "reports/pipeline_runs"
   clean_directory_contents "reports/data_quality"
   clean_directory_contents "reports/observability"
   clean_directory_contents "reports/finops"
+  clean_directory_contents "reports/query"
 
   if [[ -f "reports/final_project_report.md" ]]; then
     rm -f "reports/final_project_report.md"

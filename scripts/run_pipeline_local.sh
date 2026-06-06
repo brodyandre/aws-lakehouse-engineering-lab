@@ -20,6 +20,7 @@ if [[ -x ".venv/bin/python" ]]; then
 fi
 PYTHON_BIN="${PYTHON_BIN:-${DEFAULT_PYTHON_BIN}}"
 SPARK_MASTER_VALUE="${PIPELINE_SPARK_MASTER:-${SPARK_MASTER:-local[*]}}"
+SPARK_REMOTE_VALUE="${PIPELINE_SPARK_REMOTE:-${SPARK_REMOTE:-}}"
 
 CUSTOMERS_COUNT="${PIPELINE_CUSTOMERS:-200}"
 PRODUCTS_COUNT="${PIPELINE_PRODUCTS:-60}"
@@ -37,6 +38,9 @@ DATA_QUALITY_REPORT="reports/data_quality/data_quality_report.md"
 DATA_QUALITY_JSON="reports/data_quality/data_quality_results.json"
 FINOPS_REPORT="reports/finops/cost_estimation.md"
 FINOPS_JSON="reports/finops/cost_estimation.json"
+QUERY_REPORT="reports/query/serving_catalog.md"
+QUERY_JSON="reports/query/serving_catalog.json"
+SERVING_DATABASE="data/serving/lakehouse.duckdb"
 FINAL_REPORT="reports/final_project_report.md"
 
 timestamp() {
@@ -108,6 +112,13 @@ print(
 PY
 }
 
+SPARK_CONNECTION_ARGS=()
+if [[ -n "${SPARK_REMOTE_VALUE}" ]]; then
+  SPARK_CONNECTION_ARGS+=(--remote "${SPARK_REMOTE_VALUE}")
+else
+  SPARK_CONNECTION_ARGS+=(--master "${SPARK_MASTER_VALUE}")
+fi
+
 main() {
   log_info "Executando o pipeline local ponta a ponta do laboratório."
 
@@ -116,10 +127,12 @@ main() {
     data/bronze \
     data/silver \
     data/gold \
+    data/serving \
     reports/pipeline_runs \
     reports/data_quality \
     reports/observability \
-    reports/finops
+    reports/finops \
+    reports/query
   chmod -R a+rwX data reports
 
   if [[ ! -f ".env" && -f ".env.example" ]]; then
@@ -152,7 +165,7 @@ main() {
       --report-path "${RAW_TO_BRONZE_REPORT}" \
       --observability-json-path "${OBSERVABILITY_JSON}" \
       --observability-markdown-path "${OBSERVABILITY_MARKDOWN}" \
-      --master "${SPARK_MASTER_VALUE}"
+      "${SPARK_CONNECTION_ARGS[@]}"
 
   run_step \
     "bronze para silver" \
@@ -162,7 +175,7 @@ main() {
       --report-path "${BRONZE_TO_SILVER_REPORT}" \
       --observability-json-path "${OBSERVABILITY_JSON}" \
       --observability-markdown-path "${OBSERVABILITY_MARKDOWN}" \
-      --master "${SPARK_MASTER_VALUE}"
+      "${SPARK_CONNECTION_ARGS[@]}"
 
   run_step \
     "silver para gold" \
@@ -172,7 +185,7 @@ main() {
       --report-path "${SILVER_TO_GOLD_REPORT}" \
       --observability-json-path "${OBSERVABILITY_JSON}" \
       --observability-markdown-path "${OBSERVABILITY_MARKDOWN}" \
-      --master "${SPARK_MASTER_VALUE}"
+      "${SPARK_CONNECTION_ARGS[@]}"
 
   run_step \
     "data quality" \
@@ -181,7 +194,7 @@ main() {
       --gold-dir data/gold \
       --report-path "${DATA_QUALITY_REPORT}" \
       --json-path "${DATA_QUALITY_JSON}" \
-      --master "${SPARK_MASTER_VALUE}"
+      "${SPARK_CONNECTION_ARGS[@]}"
 
   run_step "observabilidade" run_observability_step
 
@@ -195,6 +208,14 @@ main() {
       --report-path "${FINOPS_REPORT}" \
       --json-path "${FINOPS_JSON}"
 
+  run_step \
+    "catálogo de query" \
+    "${PYTHON_BIN}" scripts/build_serving_catalog.py \
+      --gold-dir data/gold \
+      --database-path "${SERVING_DATABASE}" \
+      --report-path "${QUERY_REPORT}" \
+      --json-path "${QUERY_JSON}"
+
   run_step "relatório final" bash scripts/generate_final_report.sh
 
   assert_path_exists "${RAW_TO_BRONZE_REPORT}"
@@ -202,6 +223,7 @@ main() {
   assert_path_exists "${SILVER_TO_GOLD_REPORT}"
   assert_path_exists "${DATA_QUALITY_REPORT}"
   assert_path_exists "${FINOPS_REPORT}"
+  assert_path_exists "${QUERY_REPORT}"
   assert_path_exists "${FINAL_REPORT}"
 
   log_info "Pipeline concluído. Evidência final disponível em ${FINAL_REPORT}."

@@ -15,10 +15,11 @@ if __package__ in (None, ""):
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
-from src.config.settings import Settings, local_spark_runtime_conf, prepare_local_spark_environment
+from src.config.settings import Settings
 from src.observability.metrics_collector import build_pipeline_execution_metric
 from src.observability.pipeline_monitor import record_pipeline_metric
 from src.utils.logger import configure_logging, get_logger
+from src.utils.spark import create_spark_session
 
 LOGGER = get_logger(__name__)
 VALID_ORDER_STATUSES = ("created", "paid", "shipped", "cancelled", "refunded")
@@ -62,6 +63,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--app-name", default="bronze-to-silver-job")
     parser.add_argument("--master", default=None)
+    parser.add_argument("--remote", default=settings.spark.remote)
     return parser.parse_args(argv)
 
 
@@ -69,21 +71,14 @@ def build_spark_session(
     settings: Settings | None = None,
     app_name: str | None = None,
     master: str | None = None,
+    remote: str | None = None,
 ) -> SparkSession:
-    active_settings = settings or Settings()
-    resolved_app_name = app_name or active_settings.spark.app_name
-    resolved_master = master or active_settings.spark.master
-
-    prepare_local_spark_environment(resolved_master)
-    builder = SparkSession.builder.appName(resolved_app_name).master(resolved_master)
-    for key, value in active_settings.spark_conf.items():
-        if key in {"spark.app.name", "spark.master"}:
-            continue
-        builder = builder.config(key, value)
-    for key, value in local_spark_runtime_conf(resolved_master).items():
-        builder = builder.config(key, value)
-
-    return builder.getOrCreate()
+    return create_spark_session(
+        settings=settings,
+        app_name=app_name,
+        master=master,
+        remote=remote,
+    )
 
 
 def run_bronze_to_silver(
@@ -95,6 +90,7 @@ def run_bronze_to_silver(
     observability_markdown_path: Path | None = None,
     app_name: str | None = None,
     master: str | None = None,
+    remote: str | None = None,
     spark: SparkSession | None = None,
 ) -> list[SilverJobResult]:
     active_settings = settings or Settings()
@@ -123,6 +119,7 @@ def run_bronze_to_silver(
         settings=active_settings,
         app_name=app_name or "bronze-to-silver-job",
         master=master,
+        remote=remote,
     )
 
     started_at = datetime.now(timezone.utc)
@@ -526,6 +523,7 @@ def main(argv: list[str] | None = None) -> int:
         observability_markdown_path=args.observability_markdown_path,
         app_name=args.app_name,
         master=args.master,
+        remote=args.remote,
     )
     elapsed_seconds = round(time.perf_counter() - started_at, 2)
     LOGGER.info("Job bronze_to_silver finalizado em %s segundos", elapsed_seconds)

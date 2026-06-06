@@ -5,7 +5,7 @@
 [![Run Tests](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml)
 [![Data Quality](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml)
 
-Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia de Dados. O projeto simula uma arquitetura Lakehouse inspirada em boas práticas de AWS usando `MinIO`, `PySpark`, `Airflow`, `Parquet`, `Data Quality`, `Observabilidade`, `FinOps` e `GitHub Actions`, sem provisionar serviços reais em nuvem e sem custo de infraestrutura cloud.
+Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia de Dados. O projeto simula uma arquitetura Lakehouse inspirada em boas práticas de AWS usando `MinIO`, `PySpark`, `Spark Connect`, `Airflow 3`, `Trino`, `Parquet`, `Data Quality`, `Observabilidade`, `FinOps` e `GitHub Actions`, sem provisionar serviços reais em nuvem e sem custo de infraestrutura cloud.
 
 <a id="índice"></a>
 
@@ -19,6 +19,7 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 - [Stack Utilizada](#stack-utilizada)
 - [Camadas do Lakehouse](#camadas-do-lakehouse)
 - [Modelagem Analítica](#modelagem-analítica)
+- [Camada de Query](#camada-de-query)
 - [Pipeline de Dados](#pipeline-de-dados)
 - [Otimização Spark](#otimização-spark)
 - [Data Quality](#data-quality)
@@ -76,12 +77,14 @@ O projeto propõe um pipeline Lakehouse local-first com:
 
 - geração de dados sintéticos consistentes entre entidades de negócio;
 - camadas `Raw`, `Bronze`, `Silver` e `Gold`;
-- processamento distribuído local com `PySpark`;
+- processamento distribuído com `PySpark`, usando `Spark Connect` como endpoint opcional de exploração;
 - modelagem analítica em `Star Schema`;
-- orquestração com `Apache Airflow`;
+- orquestração com `Apache Airflow 3`, separando `core` e `execution`;
+- serving analítico com `DuckDB` e `Trino`;
 - validações automatizadas de `Data Quality`;
 - observabilidade baseada em métricas, logs e relatórios locais;
 - simulação de `FinOps` por volume de arquivos;
+- `Docker Compose` dedicado por stack para facilitar exploração do repositório;
 - validação contínua com `GitHub Actions`.
 
 [⬆️ Voltar ao índice](#índice)
@@ -95,10 +98,12 @@ Resumo do fluxo:
 1. dados sintéticos são gerados em `data/raw`;
 2. o `MinIO` simula object storage S3-compatible;
 3. jobs `PySpark` promovem os dados entre `Raw`, `Bronze`, `Silver` e `Gold`;
-4. a camada `Gold` materializa fatos e dimensões em `Star Schema`;
-5. o `Airflow` orquestra o pipeline ponta a ponta;
-6. Data Quality, Observabilidade, FinOps e benchmark geram evidências em `reports/`;
-7. o `GitHub Actions` valida código, YAML, testes e qualidade mínima do pipeline.
+4. o `Spark Connect` expõe o cluster Spark como endpoint remoto para desenvolvimento e experimentação;
+5. a camada `Gold` materializa fatos e dimensões em `Star Schema`;
+6. o `Airflow 3` separa `core API` e `execution API` para aproximar a topologia de um ambiente mais modular;
+7. `DuckDB` e `Trino` publicam uma camada de query fácil de demonstrar para visitantes;
+8. Data Quality, Observabilidade, FinOps e benchmark geram evidências em `reports/`;
+9. o `GitHub Actions` valida código, YAML, testes e qualidade mínima do pipeline.
 
 Documentação complementar:
 
@@ -106,9 +111,9 @@ Documentação complementar:
 - [Diagrama Mermaid](diagrams/architecture.md)
 
 <p align="center">
-  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" alt="Visão geral da arquitetura local do AWS Lakehouse Engineering Lab" width="100%">
+  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" alt="Diagrama da arquitetura local com fluxo entre ingestão, processamento, camadas analíticas, consumo e confiabilidade" width="100%">
 </p>
-<p align="center"><em>Arquitetura local do laboratório com MinIO, PySpark, Airflow e camadas Raw, Bronze, Silver e Gold.</em></p>
+<p align="center"><em>Visão sistêmica do laboratório com ingestão, processamento PySpark, camadas Raw, Bronze, Silver e Gold, consumo analítico e pilares operacionais.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -121,14 +126,16 @@ Documentação complementar:
 | --- | --- | --- |
 | Object storage local | MinIO | Simula buckets e fluxo estilo S3 |
 | Processamento distribuído | PySpark | Ingestão, transformação e publicação entre camadas |
-| Orquestração | Apache Airflow | Agenda, dependências, retries e histórico de execução |
+| Acesso remoto ao cluster | Spark Connect | Permite desacoplar clientes Spark do runtime do cluster |
+| Orquestração | Apache Airflow 3 | Agenda, dependências, retries e histórico com `core` e `execution` separados |
 | Formato analítico | Parquet | Persistência colunar em Bronze, Silver e Gold |
 | Modelagem analítica | SQL + Star Schema | Camada Gold e consultas de negócio |
+| Query serving | DuckDB + Trino | Publica tabelas Gold e consultas analíticas para exploração SQL |
 | Qualidade de dados | PySpark + testes | Validação de consistência em Silver e Gold |
 | Observabilidade | Relatórios JSON e Markdown | Evidência operacional local |
 | FinOps | Estimador local de custo | Simulação de storage, scan e otimização |
 | CI/CD | GitHub Actions | Lint, testes, YAML e Data Quality em pipeline público |
-| Ambiente | Docker Compose | Execução local reproduzível |
+| Ambiente | Docker Compose modular | Execução local reproduzível por stack ou em modo completo |
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -174,6 +181,42 @@ Mais detalhes em [docs/data-modeling.md](docs/data-modeling.md).
 
 [⬆️ Voltar ao índice](#índice)
 
+<a id="camada-de-query"></a>
+
+## Camada de Query
+
+Além da Gold em Parquet, o laboratório materializa um catálogo local em `DuckDB` e o expõe para exploração SQL com `Trino`. Isso melhora muito a experiência de demonstração do repositório, porque permite sair do discurso de transformação e chegar até uma superfície de consumo analítico.
+
+O fluxo de serving funciona assim:
+
+1. a camada `Gold` é gerada pelos jobs Spark;
+2. o script `scripts/build_serving_catalog.py` carrega as tabelas Gold para `data/serving/lakehouse.duckdb`;
+3. consultas de `sql/analytics/` são materializadas no schema `analytics`;
+4. o `Trino` expõe esse catálogo para navegação e consultas SQL.
+
+Consultas que ficam prontas para demonstração:
+
+- `lakehouse.analytics.revenue_by_category`
+- `lakehouse.analytics.campaign_performance`
+- `lakehouse.analytics.events_by_channel`
+- `lakehouse.analytics.top_customers`
+- `lakehouse.analytics.revenue_by_month`
+
+Comandos validados localmente para explorar essa camada:
+
+```bash
+docker exec lakehouse-trino trino --execute 'SHOW CATALOGS'
+docker exec lakehouse-trino trino --execute 'SHOW TABLES FROM lakehouse.analytics'
+docker exec lakehouse-trino trino --execute 'SELECT * FROM lakehouse.analytics.revenue_by_category LIMIT 5'
+```
+
+<p align="center">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" alt="Consulta validada da camada analytics via Trino sobre o catálogo DuckDB local" width="100%">
+</p>
+<p align="center"><em>Camada de query exposta via Trino sobre o catálogo DuckDB local, já validada com consultas reais.</em></p>
+
+[⬆️ Voltar ao índice](#índice)
+
 <a id="pipeline-de-dados"></a>
 
 ## Pipeline de Dados
@@ -186,8 +229,9 @@ Fluxo principal do laboratório:
 4. `silver_to_gold`
 5. `data_quality_checks`
 6. `cost_estimator`
-7. `spark_optimization_benchmark`, opcional
-8. `generate_final_report`
+7. `build_serving_catalog`
+8. `spark_optimization_benchmark`, opcional
+9. `generate_final_report`
 
 Esse encadeamento permite demonstrar ingestão, transformação, consumo analítico e geração de evidências técnicas em uma mesma trilha operacional.
 
@@ -260,9 +304,9 @@ Artefatos gerados:
 Mais detalhes em [docs/observability.md](docs/observability.md).
 
 <p align="center">
-  <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Métricas de observabilidade do pipeline local" width="100%">
+  <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Painel de observabilidade com resumo e métricas das últimas execuções do pipeline local" width="100%">
 </p>
-<p align="center"><em>Métricas de execução com duração, volume processado e status dos jobs.</em></p>
+<p align="center"><em>Resumo operacional das últimas execuções com status, duração, volume processado, inválidos e percentual válido.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -299,7 +343,7 @@ Mais detalhes em [docs/finops.md](docs/finops.md).
 
 O pipeline principal é orquestrado pela DAG `lakehouse_pipeline_dag`, localizada em [airflow/dags/lakehouse_pipeline_dag.py](airflow/dags/lakehouse_pipeline_dag.py).
 
-Por padrão, os jobs Spark executados pela DAG usam `local[*]` dentro do container do Airflow para priorizar reprodutibilidade no laboratório local. O cluster `Spark Master/Worker` continua disponível para exploração, troubleshooting e benchmarks, e pode ser usado pela DAG ao definir `AIRFLOW_SPARK_MASTER_URL=spark://spark-master:7077`.
+Por padrão, os jobs Spark executados pela DAG usam o cluster standalone local via `spark://spark-master:7077`. O endpoint `Spark Connect` continua exposto para experimentação, mas não é usado por padrão; `AIRFLOW_SPARK_REMOTE` permanece vazio por causa de uma regressão de serialização observada no Spark `3.5.x` com cluster standalone.
 
 Objetivos da orquestração:
 
@@ -363,6 +407,27 @@ make init
 make up
 ```
 
+### Subindo stacks específicas
+
+```bash
+make up-storage   # MinIO e bootstrap dos buckets
+make up-spark     # storage + Spark master/worker + Spark Connect
+make up-airflow   # Airflow 3 com core/execution separados
+make up-query     # Trino
+```
+
+Para a stack de query, a experiência fica completa depois de materializar o catálogo local com `make run-local` ou `make trino-catalog`, porque o `Trino` lê o arquivo `data/serving/lakehouse.duckdb`.
+
+Por padrão, o `Airflow` fica apontado para `spark://spark-master:7077` e deixa `AIRFLOW_SPARK_REMOTE` vazio. O endpoint `Spark Connect` continua exposto em `sc://localhost:15002`, mas ficou fora do caminho padrão do pipeline por causa de uma regressão aberta no `Spark 3.5.x` quando o `Connect` usa executores remotos em cluster standalone.
+
+Se quiser avaliar a variante enterprise do storage, existe um overlay opcional para `AIStor`:
+
+```bash
+make up-aistor
+```
+
+Nesse caso é necessário ajustar `AISTOR_LICENSE_PATH` no `.env`.
+
 ### Preparando ambiente Python local
 
 ```bash
@@ -375,7 +440,16 @@ source .venv/bin/activate
 ```bash
 make check
 make run-local
-make final-report
+# opcional: regenerar apenas a camada de query
+make trino-catalog
+```
+
+Validar a camada SQL via `Trino`:
+
+```bash
+docker exec lakehouse-trino trino --execute 'SHOW CATALOGS'
+docker exec lakehouse-trino trino --execute 'SHOW TABLES FROM lakehouse.analytics'
+docker exec lakehouse-trino trino --execute 'SELECT * FROM lakehouse.analytics.revenue_by_category LIMIT 5'
 ```
 
 ### Limpando saídas geradas
@@ -388,11 +462,14 @@ make clean-outputs
 
 | Componente | URL |
 | --- | --- |
-| Airflow | `http://localhost:8088` |
+| Airflow Core API / UI | `http://localhost:8088` |
+| Airflow Execution API | `http://localhost:8089` |
 | MinIO API | `http://localhost:9000` |
 | MinIO Console | `http://localhost:9001` |
 | Spark Master UI | `http://localhost:18080` |
 | Spark Worker UI | `http://localhost:18081` |
+| Spark Connect | `sc://localhost:15002` |
+| Trino | `http://localhost:8085` |
 
 Credenciais locais padrão:
 
@@ -404,7 +481,7 @@ Credenciais locais padrão:
 <p align="center">
   <img src="assets/screenshots/readme/runtime/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
 </p>
-<p align="center"><em>Exemplo da stack local com Airflow, MinIO e Spark ativos.</em></p>
+<p align="center"><em>Exemplo da stack local com Airflow 3, Spark Connect, MinIO e Trino ativos.</em></p>
 
 
 ### Executando o pipeline por etapas
@@ -450,6 +527,12 @@ Executar FinOps simulado:
 python3 src/finops/cost_estimator.py
 ```
 
+Materializar a camada de serving consumida pelo Trino:
+
+```bash
+python3 scripts/build_serving_catalog.py
+```
+
 Executar benchmark Spark:
 
 ```bash
@@ -483,6 +566,7 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 aws-lakehouse-engineering-lab/
 ├── assets/
 ├── airflow/
+├── compose/
 ├── data/
 ├── diagrams/
 ├── docs/
@@ -492,6 +576,7 @@ aws-lakehouse-engineering-lab/
 ├── sql/
 ├── src/
 ├── tests/
+├── trino/
 ├── .github/workflows/
 ├── docker-compose.yml
 ├── Makefile
@@ -505,10 +590,13 @@ aws-lakehouse-engineering-lab/
 - `src/`: configuração, geração de dados, qualidade, observabilidade e FinOps;
 - `spark/jobs/`: jobs `Raw -> Bronze -> Silver -> Gold`;
 - `spark/benchmarks/`: benchmark de otimização Spark;
-- `airflow/dags/`: orquestração do pipeline;
+- `airflow/dags/`: orquestração do pipeline e publishing da camada de serving;
+- `compose/`: composes dedicados por stack (`storage`, `spark`, `airflow`, `query`);
+- `trino/`: configuração da camada de query;
 - `docs/`: documentação temática e ADRs;
 - `assets/screenshots/readme/`: evidências visuais do README organizadas por tema;
 - `sql/`: DDL, analytics e data marts;
+- `data/serving/`: catálogo DuckDB publicado para consumo via Trino;
 - `tests/`: testes unitários, integração e Data Quality.
 
 [⬆️ Voltar ao índice](#índice)
@@ -525,6 +613,8 @@ aws-lakehouse-engineering-lab/
 | Otimização Spark | Benchmark comparando execução não otimizada e otimizada com `cache`, `broadcast`, `AQE`, `repartition` e `coalesce`. | `spark/benchmarks/`, `docs/spark-optimization.md` |
 | Modelagem Star Schema | Construção de dimensões e fatos analíticos para consumo por SQL e BI. | `spark/jobs/silver_to_gold.py`, `sql/ddl/`, `docs/data-modeling.md` |
 | Orquestração com Airflow | DAG local com dependências, retries e pipeline completo ponta a ponta. | `airflow/dags/lakehouse_pipeline_dag.py` |
+| Arquitetura orientada a serviços | Airflow 3 com `core` e `execution` separados e composes especializados por stack. | `docker-compose.yml`, `compose/` |
+| Query engine | Catálogo de serving materializado em DuckDB e exposto para SQL via Trino. | `scripts/build_serving_catalog.py`, `trino/` |
 | Data Quality | Regras automatizadas para Silver e Gold, com relatórios em Markdown e JSON. | `src/quality/`, `tests/data_quality/`, `reports/data_quality/` |
 | Observabilidade | Coleta de métricas de execução, status, volumes processados e artefatos gerados. | `src/observability/`, `reports/observability/` |
 | FinOps | Estimativa local de custo de storage e scan, análise de small files e economia com Parquet e particionamento. | `src/finops/`, `docs/finops.md`, `reports/finops/` |
@@ -547,6 +637,7 @@ aws-lakehouse-engineering-lab/
 | Otimização de processamento distribuído | Compara uma abordagem não otimizada e outra otimizada com técnicas clássicas de tuning em Spark. |
 | Modelagem dimensional | Constrói `dim_customer`, `dim_product`, `dim_campaign`, `dim_date`, `fct_sales` e `fct_web_events` em `Star Schema`. |
 | Orquestração de pipelines | Encadeia as etapas do laboratório em uma DAG Airflow com dependências, retries e execução manual ou agendada. |
+| Capacidade de serving analítico | Publica consultas analíticas em uma camada de query demonstrável com DuckDB e Trino. |
 | Data Quality | Automatiza regras para Silver e Gold, gerando relatórios e testes específicos de qualidade. |
 | Observabilidade de dados | Registra métricas de execução, volumes, inválidos, artefatos e status por job. |
 | Controle de custos em dados | Simula FinOps com estimativas de storage, scan, small files e economia com Parquet e particionamento. |
@@ -566,13 +657,14 @@ Ao executar o laboratório, espera-se gerar evidências técnicas como:
 - relatórios de Data Quality em `reports/data_quality/`;
 - métricas de observabilidade em `reports/observability/`;
 - estimativas de FinOps em `reports/finops/`;
+- catálogo de serving em `data/serving/` e `reports/query/`;
 - datasets `Parquet` em `data/bronze`, `data/silver` e `data/gold`;
 - histórico de execução e dependências no Airflow;
 - validações automatizadas no GitHub Actions.
 
 ### Guia para Inserção de Screenshots
 
-Para enriquecer o README sem poluir a narrativa, o ideal é usar de `6` a `9` capturas principais, sempre em `PNG`, com largura consistente e foco em uma mensagem por imagem.
+Para enriquecer o README sem poluir a narrativa, o ideal é usar de `6` a `10` capturas principais, sempre em `PNG`, com largura consistente e foco em uma mensagem por imagem.
 
 Pasta recomendada:
 
@@ -589,6 +681,7 @@ assets/screenshots/readme/
 ├── modeling/
 ├── observability/
 ├── orchestration/
+├── query/
 └── runtime/
 ```
 
@@ -605,6 +698,7 @@ Ordem sugerida de arquivos:
 | 7 | `cicd/07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
 | 8 | `runtime/08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
 | 9 | `orchestration/09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida |
+| 10 | `query/10-readme-trino-query-serving.png` | `Camada de Query` | Mostrar a camada analítica publicada via Trino |
 
 Como usar:
 
@@ -630,10 +724,15 @@ Como usar:
 - [x] FinOps simulado
 - [x] Benchmark de otimização Spark
 - [x] DAG do Airflow
+- [x] Airflow 3 com `core` e `execution` separados
+- [x] Spark Connect no cluster local
+- [x] Trino para exploração SQL da camada analítica
+- [x] Composes dedicados por stack
 - [x] Workflows de GitHub Actions
 - [ ] Ampliar cobertura de testes para benchmark e DAG
 - [ ] Adicionar data marts derivados e cenários analíticos extras
 - [ ] Criar dashboards locais para observabilidade e consumo analítico
+- [ ] Evoluir a camada de serving para catálogos de lakehouse como Iceberg
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -646,6 +745,7 @@ Como usar:
 - não usa billing real;
 - não reproduz elasticidade, IAM, networking gerenciado ou SLAs de nuvem;
 - benchmark Spark depende da disponibilidade de `pyspark` e `java`;
+- o endpoint `Spark Connect` está disponível, mas execuções distribuídas sobre cluster standalone ficam sujeitas a uma regressão aberta do Spark 3.5.x em cenários com executores remotos;
 - os números de performance e custo são indicativos, não equivalentes a produção;
 - o projeto foi desenhado como laboratório local robusto, não como benchmark oficial de escala.
 
@@ -656,10 +756,11 @@ Como usar:
 ## Próximos Passos
 
 - adicionar datasets públicos ou cenários de domínio adicionais;
-- publicar dashboards locais em DuckDB ou Streamlit;
+- publicar dashboards locais em Trino, DuckDB ou Streamlit;
 - incluir compactação e manutenção de partições como parte do pipeline;
 - ampliar o benchmark com skew, small files e variações de partição;
-- enriquecer a DAG com sensores, notificações locais e ramificações de execução.
+- enriquecer a DAG com sensores, notificações locais e ramificações de execução;
+- experimentar uma migração futura do catálogo de serving para Iceberg.
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -671,8 +772,9 @@ Como usar:
 | --- | --- |
 | Amazon S3 | MinIO |
 | Data Lake em S3 | diretórios locais + Parquet + MinIO |
-| Glue / EMR / jobs Spark | PySpark em ambiente local |
-| MWAA / Airflow gerenciado | Airflow em Docker |
+| Glue / EMR / jobs Spark | PySpark + Spark Connect em ambiente local |
+| MWAA / Airflow gerenciado | Airflow 3 em Docker |
+| Trino / camada federada de SQL | Trino local com catálogo DuckDB |
 | CloudWatch Logs e métricas | logs locais + relatórios Markdown/JSON |
 | Athena | consultas simuladas e estimativas de scan |
 | Cost Explorer / billing | FinOps local por volume de arquivos |

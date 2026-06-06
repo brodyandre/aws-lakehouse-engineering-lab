@@ -15,8 +15,9 @@ if __package__ in (None, ""):
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
-from src.config.settings import Settings, local_spark_runtime_conf, prepare_local_spark_environment
+from src.config.settings import Settings
 from src.utils.logger import configure_logging, get_logger
+from src.utils.spark import create_spark_session
 
 LOGGER = get_logger(__name__)
 REQUIRED_GOLD_TABLES = (
@@ -82,6 +83,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--app-name-prefix", default="spark-optimization-benchmark")
     parser.add_argument("--master", default=settings.spark.master)
+    parser.add_argument("--remote", default=settings.spark.remote)
     parser.add_argument("--scale-factor", type=int, default=1)
     parser.add_argument("--unoptimized-shuffle-partitions", type=int, default=200)
     parser.add_argument(
@@ -96,13 +98,12 @@ def build_spark_session(
     settings: Settings | None = None,
     app_name: str | None = None,
     master: str | None = None,
+    remote: str | None = None,
     shuffle_partitions: int | None = None,
     adaptive_query_execution: bool | None = None,
     auto_broadcast_threshold: int | None = None,
 ) -> SparkSession:
     active_settings = settings or Settings()
-    resolved_app_name = app_name or active_settings.spark.app_name
-    resolved_master = master or active_settings.spark.master
     resolved_shuffle_partitions = (
         shuffle_partitions
         if shuffle_partitions is not None
@@ -114,30 +115,20 @@ def build_spark_session(
         else active_settings.spark.adaptive_query_execution
     )
 
-    prepare_local_spark_environment(resolved_master)
-    builder = SparkSession.builder.appName(resolved_app_name).master(resolved_master)
-    for key, value in active_settings.spark_conf.items():
-        if key in {"spark.app.name", "spark.master"}:
-            continue
-        builder = builder.config(key, value)
-    for key, value in local_spark_runtime_conf(resolved_master).items():
-        builder = builder.config(key, value)
-
-    builder = builder.config(
-        "spark.sql.shuffle.partitions",
-        str(max(resolved_shuffle_partitions, 1)),
-    ).config(
-        "spark.sql.adaptive.enabled",
-        str(resolved_aqe).lower(),
-    )
-
+    extra_conf = {
+        "spark.sql.shuffle.partitions": str(max(resolved_shuffle_partitions, 1)),
+        "spark.sql.adaptive.enabled": str(resolved_aqe).lower(),
+    }
     if auto_broadcast_threshold is not None:
-        builder = builder.config(
-            "spark.sql.autoBroadcastJoinThreshold",
-            str(auto_broadcast_threshold),
-        )
+        extra_conf["spark.sql.autoBroadcastJoinThreshold"] = str(auto_broadcast_threshold)
 
-    return builder.getOrCreate()
+    return create_spark_session(
+        settings=active_settings,
+        app_name=app_name,
+        master=master,
+        remote=remote,
+        extra_conf=extra_conf,
+    )
 
 
 def run_benchmark(
@@ -146,6 +137,7 @@ def run_benchmark(
     report_path: Path | None = None,
     app_name_prefix: str = "spark-optimization-benchmark",
     master: str | None = None,
+    remote: str | None = None,
     scale_factor: int = 1,
     unoptimized_shuffle_partitions: int = 200,
     optimized_shuffle_partitions: int = 8,
@@ -166,6 +158,7 @@ def run_benchmark(
         gold_dir=source_root,
         app_name=f"{app_name_prefix}-unoptimized",
         master=master,
+        remote=remote,
         scale_factor=scale_factor,
         shuffle_partitions=unoptimized_shuffle_partitions,
         adaptive_query_execution=False,
@@ -177,6 +170,7 @@ def run_benchmark(
         gold_dir=source_root,
         app_name=f"{app_name_prefix}-optimized",
         master=master,
+        remote=remote,
         scale_factor=scale_factor,
         shuffle_partitions=optimized_shuffle_partitions,
         adaptive_query_execution=True,
@@ -200,6 +194,7 @@ def _execute_variant(
     gold_dir: Path,
     app_name: str,
     master: str | None,
+    remote: str | None,
     scale_factor: int,
     shuffle_partitions: int,
     adaptive_query_execution: bool,
@@ -210,6 +205,7 @@ def _execute_variant(
         settings=settings,
         app_name=app_name,
         master=master,
+        remote=remote,
         shuffle_partitions=shuffle_partitions,
         adaptive_query_execution=adaptive_query_execution,
         auto_broadcast_threshold=auto_broadcast_threshold,
@@ -625,6 +621,7 @@ def main(argv: list[str] | None = None) -> int:
         report_path=args.report_path,
         app_name_prefix=args.app_name_prefix,
         master=args.master,
+        remote=args.remote,
         scale_factor=args.scale_factor,
         unoptimized_shuffle_partitions=args.unoptimized_shuffle_partitions,
         optimized_shuffle_partitions=args.optimized_shuffle_partitions,

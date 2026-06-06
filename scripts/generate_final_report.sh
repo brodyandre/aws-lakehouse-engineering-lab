@@ -84,8 +84,9 @@ data_quality_payload = load_json(
     project_root / "reports" / "data_quality" / "data_quality_results.json"
 )
 finops_payload = load_json(project_root / "reports" / "finops" / "cost_estimation.json")
+query_payload = load_json(project_root / "reports" / "query" / "serving_catalog.json")
 
-layer_stats = [collect_layer_stats(layer) for layer in ("raw", "bronze", "silver", "gold")]
+layer_stats = [collect_layer_stats(layer) for layer in ("raw", "bronze", "silver", "gold", "serving")]
 pipeline_reports = sorted(
     path.name
     for path in (project_root / "reports" / "pipeline_runs").glob("*.md")
@@ -98,6 +99,8 @@ data_quality_summary = (data_quality_payload or {}).get("summary", {})
 data_quality_checks = (data_quality_payload or {}).get("checks", [])
 finops_summary = (finops_payload or {}).get("summary", {})
 finops_layers = (finops_payload or {}).get("layers", [])
+query_summary = (query_payload or {}).get("summary", {})
+query_tables = (query_payload or {}).get("tables", [])
 
 total_executions = int(observability_summary.get("total_executions", 0) or 0)
 total_checks = int(data_quality_summary.get("total_checks", 0) or 0)
@@ -183,6 +186,11 @@ if float(finops_summary.get("total_estimated_savings_cost_usd", 0) or 0) > 0:
         "Parquet e particionamento demonstram economia potencial de leitura em comparação com scans completos de arquivos brutos."
     )
 
+if query_summary.get("total_tables"):
+    learning_points.append(
+        "A camada de serving em DuckDB publica as tabelas Gold e as consultas analíticas em um formato simples de consumir via Trino."
+    )
+
 lines = [
     "# Final Project Report",
     "",
@@ -264,6 +272,11 @@ lines.extend(
         f"- Scan simulado estilo Athena: `${finops_summary.get('total_simulated_athena_scan_cost_usd', 0)}`",
         f"- Scan otimizado estimado: `${finops_summary.get('total_optimized_athena_scan_cost_usd', 0)}`",
         f"- Economia estimada: `${finops_summary.get('total_estimated_savings_cost_usd', 0)}`",
+        "",
+        "## Query Serving",
+        "",
+        f"- Catálogo materializado: `{query_summary.get('database_path', 'n/a')}`",
+        f"- Tabelas publicadas para consumo SQL: `{query_summary.get('total_tables', 0)}`",
     ]
 )
 
@@ -283,6 +296,22 @@ if finops_layers:
             f"{layer.get('average_file_size_human', 'n/a')} | {layer.get('has_small_files_problem', False)} |"
         )
 
+if query_tables:
+    lines.extend(
+        [
+            "",
+            "| Schema | Tabela | Linhas |",
+            "| --- | --- | ---: |",
+        ]
+    )
+    for table in query_tables[:10]:
+        if not isinstance(table, dict):
+            continue
+        lines.append(
+            f"| {table.get('schema_name', 'n/a')} | {table.get('table_name', 'n/a')} | "
+            f"{table.get('row_count', 'n/a')} |"
+        )
+
 lines.extend(
     [
         "",
@@ -292,6 +321,7 @@ lines.extend(
         f"- Observabilidade: `reports/observability/pipeline_metrics.md` e `reports/observability/pipeline_metrics.json`",
         f"- Data Quality: `reports/data_quality/data_quality_report.md` e `reports/data_quality/data_quality_results.json`",
         f"- FinOps: `reports/finops/cost_estimation.md` e `reports/finops/cost_estimation.json`",
+        f"- Query Serving: `reports/query/serving_catalog.md` e `reports/query/serving_catalog.json`",
         "",
         "## Principais Aprendizados",
         "",

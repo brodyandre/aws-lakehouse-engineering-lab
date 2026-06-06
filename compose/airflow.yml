@@ -1,0 +1,69 @@
+services:
+  postgres:
+    extends:
+      file: ../docker-compose.yml
+      service: postgres
+
+  minio:
+    extends:
+      file: ../docker-compose.yml
+      service: minio
+
+  minio-init:
+    extends:
+      file: ../docker-compose.yml
+      service: minio-init
+
+  spark-master:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-master
+
+  spark-worker:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-worker
+
+  spark-connect:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-connect
+
+  airflow-init:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-init
+
+  airflow-api-core:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-api-core
+
+  airflow-api-execution:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-api-execution
+
+  airflow-scheduler:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-scheduler
+
+  airflow-dag-processor:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-dag-processor
+
+  airflow-triggerer:
+    extends:
+      file: ../docker-compose.yml
+      service: airflow-triggerer
+
+volumes:
+  postgres_data:
+  minio_data:
+  airflow_logs:
+
+networks:
+  lakehouse:
+    name: ${COMPOSE_PROJECT_NAME:-aws-lakehouse-engineering-lab}_network

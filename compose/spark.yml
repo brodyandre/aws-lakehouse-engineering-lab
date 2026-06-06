@@ -1,0 +1,32 @@
+services:
+  minio:
+    extends:
+      file: ../docker-compose.yml
+      service: minio
+
+  minio-init:
+    extends:
+      file: ../docker-compose.yml
+      service: minio-init
+
+  spark-master:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-master
+
+  spark-worker:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-worker
+
+  spark-connect:
+    extends:
+      file: ../docker-compose.yml
+      service: spark-connect
+
+volumes:
+  minio_data:
+
+networks:
+  lakehouse:
+    name: ${COMPOSE_PROJECT_NAME:-aws-lakehouse-engineering-lab}_network

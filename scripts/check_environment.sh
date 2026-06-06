@@ -17,10 +17,12 @@ REQUIRED_DIRS=(
   "data/bronze"
   "data/silver"
   "data/gold"
+  "data/serving"
   "reports/pipeline_runs"
   "reports/data_quality"
   "reports/observability"
   "reports/finops"
+  "reports/query"
 )
 
 ERRORS=0
@@ -79,6 +81,7 @@ check_python_dependencies() {
 import importlib
 
 required_modules = {
+    "duckdb": "duckdb",
     "faker": "Faker",
     "pandas": "pandas",
     "pyarrow": "pyarrow",

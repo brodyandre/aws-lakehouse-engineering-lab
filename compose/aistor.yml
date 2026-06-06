@@ -1,0 +1,13 @@
+services:
+  minio:
+    image: ${AISTOR_IMAGE_NAME:-quay.io/minio/aistor/minio:latest}
+    command: server /mnt/data --console-address ":9001"
+    volumes:
+      - minio_data:/mnt/data
+      - ${AISTOR_LICENSE_PATH}:/minio.license:ro
+
+  minio-init:
+    image: ${AISTOR_MC_IMAGE_NAME:-quay.io/minio/aistor/mc:latest}
+
+volumes:
+  minio_data:

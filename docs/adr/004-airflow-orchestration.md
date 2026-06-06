@@ -20,6 +20,8 @@ Além disso, a ferramenta escolhida deveria ser reconhecida no mercado e compat�
 
 Usar `Apache Airflow` como orquestrador principal do projeto, com DAGs executadas localmente em Docker e uma DAG central para o pipeline Lakehouse.
 
+Na evolução atual do laboratório, a implementação foi atualizada para `Airflow 3`, separando os apps `core` e `execution` em containers distintos e adicionando o `dag-processor` como componente explícito da stack.
+
 O Airflow foi escolhido para:
 
 - representar um padrão realista de orquestração em dados;
@@ -42,6 +44,7 @@ O Airflow foi escolhido para:
 - O projeto demonstra entendimento de orquestração além de scripts isolados.
 - Retries, ordem de execução e histórico passam a ser parte visível da solução.
 - A DAG reforça a leitura do projeto como arquitetura, não apenas como coleção de jobs.
+- A topologia do Airflow fica mais próxima de uma arquitetura moderna orientada a serviços.
 
 ## Trade-offs
 
@@ -53,4 +56,5 @@ O Airflow foi escolhido para:
 
 - A documentação de arquitetura precisa explicar a função da DAG principal.
 - O Compose inclui serviços adicionais como Postgres e componentes do Airflow.
+- A documentação passa a explicar a separação entre `core API`, `execution API`, `scheduler`, `triggerer` e `dag-processor`.
 - A narrativa do projeto passa a incluir não apenas transformação, mas também operação de pipeline.

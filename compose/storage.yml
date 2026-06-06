@@ -1,0 +1,17 @@
+services:
+  minio:
+    extends:
+      file: ../docker-compose.yml
+      service: minio
+
+  minio-init:
+    extends:
+      file: ../docker-compose.yml
+      service: minio-init
+
+volumes:
+  minio_data:
+
+networks:
+  lakehouse:
+    name: ${COMPOSE_PROJECT_NAME:-aws-lakehouse-engineering-lab}_network
