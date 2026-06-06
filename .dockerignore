@@ -1,7 +1,5 @@
 .git
 .github
-.agents
-.codex
 .venv
 __pycache__
 *.pyc

@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover - compatibilidade quando dotenv não est
 
 
 VALID_LAYERS = ("raw", "bronze", "silver", "gold")
-VALID_REPORT_CATEGORIES = ("pipeline_runs", "data_quality", "finops", "observability")
+VALID_REPORT_CATEGORIES = ("pipeline_runs", "data_quality", "finops", "observability", "query")
 TRUE_VALUES = {"1", "true", "yes", "on"}
 FALSE_VALUES = {"0", "false", "no", "off"}
 
@@ -33,6 +33,17 @@ def _get_int_env(names: tuple[str, ...], default: int) -> int:
     except ValueError as exc:
         joined_names = ", ".join(names)
         raise ValueError(f"Variável de ambiente inválida para inteiro: {joined_names}") from exc
+
+
+def _get_optional_env(names: tuple[str, ...]) -> str | None:
+    for name in names:
+        value = os.getenv(name)
+        if value is None:
+            continue
+        stripped_value = value.strip()
+        if stripped_value:
+            return stripped_value
+    return None
 
 
 def _get_bool_env(names: tuple[str, ...], default: bool) -> bool:
@@ -110,6 +121,7 @@ class SparkSettings:
         default_factory=lambda: _get_bool_env(("SPARK_ADAPTIVE_QUERY_EXECUTION",), True)
     )
     timezone: str = field(default_factory=lambda: _get_env(("SPARK_TIMEZONE",), "UTC"))
+    remote: str | None = field(default_factory=lambda: _get_optional_env(("SPARK_REMOTE",)))
 
     def as_spark_conf(self) -> dict[str, str]:
         return {
@@ -158,6 +170,10 @@ class Settings:
     def gold_data_path(self) -> Path:
         return self.data_root / "gold"
 
+    @property
+    def serving_data_path(self) -> Path:
+        return self.data_root / "serving"
+
     def layer_path(self, layer: str) -> Path:
         layer_map = {
             "raw": self.raw_data_path,
@@ -189,12 +205,17 @@ class Settings:
     def observability_report_path(self) -> Path:
         return self.reports_root / "observability"
 
+    @property
+    def query_report_path(self) -> Path:
+        return self.reports_root / "query"
+
     def report_path(self, category: str) -> Path:
         report_map = {
             "pipeline_runs": self.pipeline_runs_report_path,
             "data_quality": self.data_quality_report_path,
             "finops": self.finops_report_path,
             "observability": self.observability_report_path,
+            "query": self.query_report_path,
         }
         if category not in report_map:
             raise ValueError(
@@ -246,6 +267,8 @@ class Settings:
             self.data_quality_report_path,
             self.finops_report_path,
             self.observability_report_path,
+            self.query_report_path,
+            self.serving_data_path,
         ]
 
 

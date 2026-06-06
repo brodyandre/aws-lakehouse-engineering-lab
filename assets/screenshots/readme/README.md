@@ -6,6 +6,7 @@ Esta pasta organiza as capturas usadas no `README.md` por tema, para facilitar m
 
 ```text
 assets/screenshots/readme/
+├── archive/
 ├── architecture/
 ├── cicd/
 ├── data-quality/
@@ -13,6 +14,7 @@ assets/screenshots/readme/
 ├── modeling/
 ├── observability/
 ├── orchestration/
+├── query/
 └── runtime/
 ```
 
@@ -25,10 +27,13 @@ assets/screenshots/readme/
 - `finops/`: relatórios de custo simulado.
 - `orchestration/`: DAG do Airflow e execuções do pipeline.
 - `cicd/`: workflows e checks do GitHub Actions.
+- `query/`: evidências da camada de serving e exploração SQL via Trino.
 - `runtime/`: stack local e serviços em execução.
+- `archive/`: versões anteriores preservadas automaticamente antes de uma nova captura sobrescrever o nome principal.
 
 ## Boas práticas
 
 - manter nomes numerados para preservar a ordem narrativa do `README`;
 - usar `PNG` com recorte limpo e boa legibilidade;
+- ao regenerar imagens com `scripts/capture_readme_screenshots.cjs`, os arquivos anteriores são movidos para `archive/`;
 - atualizar o `README.md` sempre que um arquivo for movido ou renomeado.

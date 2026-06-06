@@ -6,15 +6,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 README_PATH = PROJECT_ROOT / "README.md"
 
 SCREENSHOT_BLOCK_RE = re.compile(
-    r"<!--\n"
-    r"Screenshot sugerido: (?P<path>[^\n]+)\n\n"
-    r"(?P<body>.*?)\n"
-    r"-->",
+    r"<!--\n" r"Screenshot sugerido: (?P<path>[^\n]+)\n\n" r"(?P<body>.*?)\n" r"-->",
     re.DOTALL,
 )
 

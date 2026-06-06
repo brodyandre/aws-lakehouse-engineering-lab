@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from textwrap import dedent
 
-from airflow import DAG
-from airflow.operators.bash import BashOperator
+from airflow.providers.standard.operators.bash import BashOperator
+from airflow.sdk import DAG
 
 PROJECT_ROOT = Path("/opt/project")
 RAW_DIR = PROJECT_ROOT / "data" / "raw"
@@ -27,6 +27,10 @@ OBSERVABILITY_MARKDOWN_PATH = OBSERVABILITY_REPORTS_DIR / "pipeline_metrics.md"
 RAW_TO_BRONZE_REPORT_PATH = PIPELINE_REPORTS_DIR / "raw_to_bronze_report.md"
 BRONZE_TO_SILVER_REPORT_PATH = PIPELINE_REPORTS_DIR / "bronze_to_silver_report.md"
 SILVER_TO_GOLD_REPORT_PATH = PIPELINE_REPORTS_DIR / "silver_to_gold_report.md"
+QUERY_REPORTS_DIR = REPORTS_DIR / "query"
+SERVING_DATABASE_PATH = PROJECT_ROOT / "data" / "serving" / "lakehouse.duckdb"
+SERVING_REPORT_PATH = QUERY_REPORTS_DIR / "serving_catalog.md"
+SERVING_JSON_PATH = QUERY_REPORTS_DIR / "serving_catalog.json"
 
 DEFAULT_ARGS = {
     "owner": "lakehouse-lab",
@@ -44,7 +48,8 @@ def _project_bash(command: str) -> str:
           "{PIPELINE_REPORTS_DIR}" \
           "{DATA_QUALITY_REPORTS_DIR}" \
           "{FINOPS_REPORTS_DIR}" \
-          "{OBSERVABILITY_REPORTS_DIR}"
+          "{OBSERVABILITY_REPORTS_DIR}" \
+          "{QUERY_REPORTS_DIR}"
         cd "{PROJECT_ROOT}"
         {command}
         """
@@ -73,8 +78,9 @@ with DAG(
         4. silver para gold
         5. data quality
         6. FinOps simulado
-        7. benchmark Spark opcional
-        8. relatório final consolidado
+        7. catálogo de serving para Trino
+        8. benchmark Spark opcional
+        9. relatório final consolidado
 
         O benchmark pode ser habilitado definindo `ENABLE_SPARK_OPTIMIZATION_BENCHMARK=true`
         no ambiente do container do Airflow.
@@ -104,7 +110,8 @@ with DAG(
                   --report-path "{RAW_TO_BRONZE_REPORT_PATH}" \
                   --observability-json-path "{OBSERVABILITY_JSON_PATH}" \
                   --observability-markdown-path "{OBSERVABILITY_MARKDOWN_PATH}" \
-                  --master "${{SPARK_MASTER_URL:-local[*]}}"
+                  --master "${{SPARK_MASTER_URL:-local[*]}}" \
+                  --remote "${{SPARK_REMOTE:-}}"
                 """
             ).strip()
         ),
@@ -121,7 +128,8 @@ with DAG(
                   --report-path "{BRONZE_TO_SILVER_REPORT_PATH}" \
                   --observability-json-path "{OBSERVABILITY_JSON_PATH}" \
                   --observability-markdown-path "{OBSERVABILITY_MARKDOWN_PATH}" \
-                  --master "${{SPARK_MASTER_URL:-local[*]}}"
+                  --master "${{SPARK_MASTER_URL:-local[*]}}" \
+                  --remote "${{SPARK_REMOTE:-}}"
                 """
             ).strip()
         ),
@@ -138,7 +146,8 @@ with DAG(
                   --report-path "{SILVER_TO_GOLD_REPORT_PATH}" \
                   --observability-json-path "{OBSERVABILITY_JSON_PATH}" \
                   --observability-markdown-path "{OBSERVABILITY_MARKDOWN_PATH}" \
-                  --master "${{SPARK_MASTER_URL:-local[*]}}"
+                  --master "${{SPARK_MASTER_URL:-local[*]}}" \
+                  --remote "${{SPARK_REMOTE:-}}"
                 """
             ).strip()
         ),
@@ -154,7 +163,8 @@ with DAG(
                   --gold-dir "{GOLD_DIR}" \
                   --report-path "{DATA_QUALITY_REPORTS_DIR / 'data_quality_report.md'}" \
                   --json-path "{DATA_QUALITY_REPORTS_DIR / 'data_quality_results.json'}" \
-                  --master "${{SPARK_MASTER_URL:-local[*]}}"
+                  --master "${{SPARK_MASTER_URL:-local[*]}}" \
+                  --remote "${{SPARK_REMOTE:-}}"
                 """
             ).strip()
         ),
@@ -177,6 +187,21 @@ with DAG(
         ),
     )
 
+    prepare_query_serving = BashOperator(
+        task_id="prepare_query_serving",
+        bash_command=_project_bash(
+            dedent(
+                f"""
+                python3 "{PROJECT_ROOT / 'scripts' / 'build_serving_catalog.py'}" \
+                  --gold-dir "{GOLD_DIR}" \
+                  --database-path "{SERVING_DATABASE_PATH}" \
+                  --report-path "{SERVING_REPORT_PATH}" \
+                  --json-path "{SERVING_JSON_PATH}"
+                """
+            ).strip()
+        ),
+    )
+
     spark_optimization_benchmark = BashOperator(
         task_id="spark_optimization_benchmark",
         bash_command=_project_bash(
@@ -186,7 +211,8 @@ with DAG(
                   python3 "{BENCHMARK_SCRIPT_PATH}" \
                     --gold-dir "{GOLD_DIR}" \
                     --report-path "{BENCHMARK_REPORT_PATH}" \
-                    --master "${{SPARK_MASTER_URL:-local[*]}}"
+                    --master "${{SPARK_MASTER_URL:-local[*]}}" \
+                    --remote "${{SPARK_REMOTE:-}}"
                 else
                   printf '%s\n' \
                     '# Spark Optimization Benchmark' \
@@ -215,5 +241,15 @@ with DAG(
     )
 
     (generate_synthetic_data >> raw_to_bronze >> bronze_to_silver >> silver_to_gold)
-    silver_to_gold >> [data_quality_checks, cost_estimator, spark_optimization_benchmark]
-    [data_quality_checks, cost_estimator, spark_optimization_benchmark] >> generate_final_report
+    silver_to_gold >> [
+        data_quality_checks,
+        cost_estimator,
+        prepare_query_serving,
+        spark_optimization_benchmark,
+    ]
+    [
+        data_quality_checks,
+        cost_estimator,
+        prepare_query_serving,
+        spark_optimization_benchmark,
+    ] >> generate_final_report

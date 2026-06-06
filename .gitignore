@@ -86,3 +86,12 @@ reports/finops/*
 !reports/finops/README.md
 reports/observability/*
 !reports/observability/.gitkeep
+reports/query/*
+!reports/query/.gitkeep
+
+# Query serving artifacts
+data/serving/*
+!data/serving/.gitkeep
+
+# Screenshot backups
+assets/screenshots/readme/archive/

@@ -1,0 +1,9 @@
+services:
+  trino:
+    extends:
+      file: ../docker-compose.yml
+      service: trino
+
+networks:
+  lakehouse:
+    name: ${COMPOSE_PROJECT_NAME:-aws-lakehouse-engineering-lab}_network

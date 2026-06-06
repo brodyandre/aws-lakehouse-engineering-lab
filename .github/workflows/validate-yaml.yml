@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -29,10 +29,15 @@ jobs:
 
       - name: Lint YAML files
         run: |
-          yamllint docker-compose.yml .github/workflows
+          yamllint docker-compose.yml compose .github/workflows
 
-      - name: Validate docker-compose.yml
+      - name: Validate docker compose configurations
         run: docker compose --env-file .env.example -f docker-compose.yml config -q
+      - run: docker compose --env-file .env.example -f compose/storage.yml config -q
+      - run: docker compose --env-file .env.example -f compose/spark.yml config -q
+      - run: docker compose --env-file .env.example -f compose/airflow.yml config -q
+      - run: docker compose --env-file .env.example -f compose/query.yml config -q
+      - run: docker compose --env-file .env.example -f docker-compose.yml -f compose/aistor.yml config -q
 
       - name: Validate GitHub Actions workflows
-        uses: rhysd/actionlint@v1
+        uses: devops-actions/actionlint@v0.1.12

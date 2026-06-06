@@ -20,7 +20,7 @@ Este laboratório implementa uma arquitetura Lakehouse local-first para demonstr
 
 O fluxo arquitetural parte de dados sintéticos de e-commerce e marketing, gerados em `data/raw`. Esses arquivos representam o papel de uma zona de aterrissagem de dados. O MinIO simula o comportamento de um armazenamento estilo S3, enquanto o PySpark materializa as transições entre as camadas Bronze, Silver e Gold em Parquet.
 
-No topo do fluxo, o Apache Airflow orquestra as etapas do pipeline e registra dependências, retries e histórico operacional. Ao final da execução, módulos de Data Quality, Observabilidade e FinOps geram relatórios locais em Markdown e JSON, criando evidências técnicas semelhantes ao que times de dados acompanham em ambientes corporativos.
+No topo do fluxo, o `Spark Connect` desacopla os clientes Spark do cluster local como endpoint opcional de experimentação, o `Airflow 3` separa `core API` e `execution API` para uma topologia mais modular, e a camada de `DuckDB + Trino` publica a Gold para exploração SQL. Ao final da execução, módulos de Data Quality, Observabilidade e FinOps geram relatórios locais em Markdown e JSON, criando evidências técnicas semelhantes ao que times de dados acompanham em ambientes corporativos.
 
 ## Diagrama Mermaid
 
@@ -42,16 +42,21 @@ flowchart TB
         C2["bronze_to_silver.py"]
         C3["silver_to_gold.py"]
         C4["spark_optimization_benchmark.py"]
+        C5["Spark Connect"]
     end
 
     subgraph Orchestration["Orquestração"]
-        D1["Airflow DAG<br/>lakehouse_pipeline_dag"]
+        D1["Airflow 3 Core API"]
+        D2["Airflow 3 Execution API"]
+        D3["Airflow DAG<br/>lakehouse_pipeline_dag"]
     end
 
     subgraph Analytics["Consumo analítico"]
         E1["Gold em Star Schema<br/>dim_customer, dim_product, dim_campaign, dim_date"]
         E2["fct_sales e fct_web_events"]
         E3["SQL analítico e data marts"]
+        E4["DuckDB serving catalog"]
+        E5["Trino"]
     end
 
     subgraph Reliability["Confiabilidade e operação"]
@@ -61,8 +66,13 @@ flowchart TB
         F4["GitHub Actions"]
     end
 
-    D1 --> A1
+    D1 --> D3
+    D2 --> D3
+    D3 --> A1
     A2 --> C1
+    C5 --> C1
+    C5 --> C2
+    C5 --> C3
     C1 --> B2
     B2 --> C2
     C2 --> B2
@@ -71,6 +81,9 @@ flowchart TB
     C3 --> E2
     E1 --> E3
     E2 --> E3
+    E1 --> E4
+    E2 --> E4
+    E4 --> E5
     E2 --> C4
     E1 --> C4
     F1 --> B2
@@ -117,7 +130,11 @@ Cada job principal gera métricas operacionais locais, permitindo acompanhar dur
 
 O módulo de FinOps usa apenas o filesystem local para estimar custo estilo S3 e Athena, sinalizando também risco de `small files` e economia potencial com Parquet e particionamento.
 
-### 8. Benchmark Spark
+### 8. Serving e Query
+
+Depois da Gold, o laboratório materializa um catálogo `DuckDB` em `data/serving/lakehouse.duckdb` e publica tabelas analíticas para exploração via `Trino`. Essa camada melhora a narrativa de portfólio porque fecha o ciclo entre transformação e consumo.
+
+### 9. Benchmark Spark
 
 O benchmark compara uma abordagem Spark ingênua com outra otimizada, reforçando boas práticas de performance sem depender de cluster pago.
 
@@ -133,13 +150,15 @@ Sequência da DAG:
 4. `silver_to_gold`
 5. `data_quality_checks`
 6. `cost_estimator`
-7. `spark_optimization_benchmark`, opcional
-8. `generate_final_report`
+7. `build_serving_catalog`
+8. `spark_optimization_benchmark`, opcional
+9. `generate_final_report`
 
 Decisões de desenho:
 
 - `BashOperator` para reaproveitar scripts já existentes e manter execução simples no ambiente local;
-- `PythonOperator` para consolidar o relatório final;
+- separação entre `core API` e `execution API` do Airflow 3 para aproximar a topologia de um ambiente moderno;
+- `Spark Connect` como endpoint opcional de experimentação; por causa de uma regressão de serialização observada no Spark `3.5.x` com cluster standalone, a DAG usa `spark://spark-master:7077` por padrão e mantém `SPARK_REMOTE` vazio até nova estabilização;
 - execução manual por padrão, com possibilidade de mudar para agendamento diário;
 - `retries` configurados para aproximar o comportamento de pipelines corporativos.
 
@@ -149,7 +168,9 @@ Decisões de desenho:
 | --- | --- | --- |
 | MinIO | Amazon S3 | simular object storage |
 | Parquet local | Data Lake em S3 | representar persistência analítica colunar |
-| Airflow local | MWAA ou Airflow gerenciado | orquestrar jobs e dependências |
+| Spark Connect | client/server Spark | desacoplar cliente e cluster |
+| Airflow 3 local | MWAA ou Airflow gerenciado | orquestrar jobs e dependências |
+| Trino local | query engine analítico | publicar consumo SQL |
 | Logs locais | CloudWatch Logs | rastrear execução e troubleshooting |
 | Relatórios locais | observabilidade corporativa | materializar evidências operacionais |
 | Testes locais | etapa de CI/CD | validar regressão antes de mudanças |
