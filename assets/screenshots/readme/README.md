@@ -9,7 +9,7 @@ As imagens desta pasta ajudam a apresentar o laboratório de Engenharia de Dados
 | `architecture/01-readme-architecture-overview.png` | Diagrama de arquitetura publicado no projeto | Explica o desenho da solução; não representa implantação cloud real. |
 | `orchestration/06-readme-airflow-dag.png` | O script `scripts/capture_readme_screenshots.cjs` tenta acessar a interface real do Airflow e capturá-la | Conferir se a imagem mostra a DAG e a execução pretendida; a captura não valida automaticamente o estado das tarefas. |
 | `observability/04-readme-observability-metrics.png` | Painel HTML gerado a partir de `reports/observability/pipeline_metrics.json` quando disponível | O script contém valores substitutos; validar a existência e a data do relatório de origem. |
-| `query/10-readme-trino-query-serving.png` | Painel HTML gerado por Playwright | As linhas de resultado são **predefinidas no código**; não são resultado de uma consulta SQL capturada ao vivo. |
+| `query/10-readme-trino-query-serving.png` | **Captura real do terminal VS Code + WSL2, em 27/10/2026**, após consulta SQL via `docker exec lakehouse-trino trino` | Exibe dados sintéticos das tabelas `lakehouse.gold.fct_sales` e `lakehouse.gold.dim_product`; cinco categorias, receita líquida, receita bruta, descontos e unidades vendidas. O catálogo `analytics.revenue_by_category` local estava em versão anterior. |
 | `runtime/08-readme-local-services-overview.png` | Painel HTML gerado por Playwright | Todos os status `healthy` estão **predefinidos no código**; não são uma checagem atual de saúde dos serviços. |
 | Demais imagens (`modeling`, `data-quality`, `finops`, `cicd`, `orchestration/09`) | Arquivos PNG versionados no repositório | A origem exata da captura não foi estabelecida por este gerador. Evitar afirmar resultado operacional sem verificar a tela e o artefato correspondente. |
 
@@ -42,4 +42,4 @@ assets/screenshots/readme/
 └── README.md
 ```
 
-**Nota de manutenção:** o script `scripts/capture_readme_screenshots.cjs` pode criar `archive/` para preservar versões anteriores antes de sobrescrever imagens. Reveja sempre conteúdo, data e legenda após regenerar imagens.
+**Nota de manutenção:** o script `scripts/capture_readme_screenshots.cjs` ainda contém o gerador **ilustrativo antigo** de Trino com linhas predefinidas. **Não execute esse gerador sobre a pasta atual sem preservar a nova evidência real**, pois ele poderá sobrescrever `query/10-readme-trino-query-serving.png`. O script também pode criar `archive/` para preservar versões anteriores. Reveja sempre conteúdo, data e legenda após regenerar imagens.
