@@ -23,8 +23,6 @@ As imagens desta pasta ajudam a apresentar o laboratório de Engenharia de Dados
 
 ### Fontes de evidência que acompanham o código
 
-- [Relatório de diagnóstico DE-101](../../../docs/incidents/de-101-raw-silver-divergence.md): explica a diferença entre 1.000 itens Silver e 937 linhas Gold.
-- [Relatório de diagnóstico DE-102](../../../docs/incidents/de-102-analytics-revenue-status.md): analisa o risco de interpretação da métrica de receita.
 - [Workflows GitHub Actions](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions): resultados públicos de execução dos checks.
 - `reports/data_quality/`, `reports/observability/`, `reports/finops/` e `reports/query/`: relatórios gerados localmente, não necessariamente versionados.
 
