@@ -1,15 +1,117 @@
 # AWS Lakehouse Engineering Lab
 
+**Como transformar dados de uma operação comercial em informações confiáveis para análise — da ingestão aos relatórios.**
+
 [![Validate Python](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-python.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-python.yml)
 [![Validate YAML](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-yaml.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-yaml.yml)
 [![Run Tests](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml)
 [![Data Quality](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml)
 
-Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia de Dados. O projeto simula uma arquitetura Lakehouse inspirada em boas práticas de AWS usando `MinIO`, `PySpark`, `Spark Connect`, `Airflow 3`, `Trino`, `Parquet`, `Data Quality`, `Observabilidade`, `FinOps` e `GitHub Actions`, sem provisionar serviços reais em nuvem e sem custo de infraestrutura cloud.
+> **Para quem não é da área de tecnologia:** imagine uma empresa que precisa entender suas vendas, seus clientes e o desempenho de campanhas. Antes de produzir indicadores, ela precisa reunir os dados, corrigir inconsistências e organizar informações de diferentes fontes. Este projeto demonstra como construir esse processo de forma automatizada, verificável e reproduzível.
+
+**Natureza do projeto:** laboratório autoral de Engenharia de Dados, executado localmente com **dados sintéticos**. Simula conceitos de arquitetura AWS, mas **não utiliza serviços AWS reais nem representa uma implantação corporativa em produção**.
+
+**Explore em poucos minutos:** [Visão rápida](#o-projeto-em-um-minuto) · [Fluxo e arquitetura](#como-os-dados-percorrem-o-lakehouse) · [Demonstração visual](#demonstracao-visual) · [Entregas e competências](#entregas-e-competencias) · [Detalhamento técnico](#índice)
+
+<a id="o-projeto-em-um-minuto"></a>
+
+## O projeto em um minuto
+
+| Pergunta | Resposta |
+| --- | --- |
+| **Qual é o problema?** | Informações de pedidos, clientes, produtos e campanhas podem estar fragmentadas ou apresentar inconsistências, dificultando análises confiáveis. |
+| **O que foi desenvolvido?** | Um pipeline que gera dados sintéticos de e-commerce, organiza registros em etapas, aplica validações e prepara tabelas para consultas comerciais. |
+| **Qual é o resultado?** | Estrutura analítica para consultar vendas por categoria e período, desempenho de campanhas, comportamento digital e clientes. |
+| **Como garantir confiança?** | Regras de qualidade, rastreabilidade, logs e métricas de execução, testes automatizados e documentação das decisões técnicas. |
+| **Quais tecnologias entram em ação?** | Python, PySpark, SQL, Airflow, MinIO, Parquet, DuckDB, Trino, Docker e GitHub Actions. |
+
+<a id="como-os-dados-percorrem-o-lakehouse"></a>
+
+## Como os dados percorrem o Lakehouse
+
+**Dados de origem → preparação → verificação de qualidade → tabelas analíticas → consultas de negócio.**
+
+O processo é organizado em quatro camadas, com funções distintas:
+
+| Etapa | O que acontece | Por que isso importa |
+| --- | --- | --- |
+| **Raw** | Recepção dos dados sintéticos em seu formato de origem. | Mantém uma referência para conferências. |
+| **Bronze** | Organização estrutural e gravação em formato apropriado ao processamento. | Padroniza a entrada e preserva rastreabilidade. |
+| **Silver** | Tratamento de tipos, regras de negócio e sinalização de registros inválidos. | Permite identificar problemas antes da análise. |
+| **Gold** | Publicação das tabelas de fatos e dimensões voltadas ao consumo analítico. | Facilita responder perguntas sobre vendas, clientes e campanhas. |
+
+<p align="center">
+  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" width="100%" alt="Diagrama de arquitetura do laboratório: origem de dados, camadas Raw, Bronze, Silver e Gold, Airflow, Spark, qualidade e consumo analítico">
+</p>
+<p align="center"><em>Visão arquitetural do laboratório. O diagrama representa o desenho local da solução, não serviços AWS em produção.</em></p>
+
+<a id="entregas-e-competencias"></a>
+
+## Entregas e competências demonstradas
+
+Em vez de apenas listar tecnologias, estes componentes permitem localizar **o que está implementado e onde conferir o código ou a documentação**:
+
+| Entrega verificável | Competência evidenciada | Onde conferir |
+| --- | --- | --- |
+| **4 camadas de dados:** Raw, Bronze, Silver e Gold | Ingestão, transformação, modelagem e organização do ciclo de vida dos dados | [Jobs PySpark](spark/jobs/) |
+| **Modelo analítico:** 4 dimensões e 2 fatos | Modelagem dimensional e preparação de informações para análise | [Documentação do modelo](docs/data-modeling.md) |
+| **5 consultas analíticas:** receita, campanhas, canais, clientes e evolução mensal | SQL e entrega de dados para consumidores analíticos | [Consultas SQL](sql/analytics/) |
+| **DAG do Airflow e infraestrutura local modular** | Orquestração, dependências de execução e operação com containers | [DAG](airflow/dags/lakehouse_pipeline_dag.py) · [Docker Compose](compose/) |
+| **Testes, Data Quality, observabilidade e FinOps simulado** | Confiabilidade, acompanhamento operacional e atenção à eficiência | [Testes](tests/) · [Documentação](docs/) |
+| **4 workflows de GitHub Actions** | Integração contínua, automatização de validações e boas práticas de versionamento | [Workflows](.github/workflows/) · [Execuções públicas](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions) |
+
+*Os quantitativos descrevem artefatos existentes no código, não indicadores de desempenho medidos em ambiente de produção.*
+
+<a id="demonstracao-visual"></a>
+
+## Demonstração visual
+
+As imagens abaixo ajudam a visualizar os componentes do projeto. **Algumas são capturas de interfaces; outras são painéis demonstrativos**. Para conferir o comportamento real, utilize também os códigos, comandos e relatórios vinculados.
+
+### 1. Automação do pipeline: Apache Airflow
+
+<p align="center">
+  <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" width="90%" alt="Interface Airflow do laboratório com a DAG de processamento de dados">
+</p>
+<p align="center"><em>A DAG organiza as dependências entre ingestão, preparação, qualidade e publicação. [Conheça a implementação](#orquestração-com-airflow).</em></p>
+
+### 2. Dados preparados para a análise: modelo Gold
+
+<p align="center">
+  <img src="assets/screenshots/readme/modeling/02-readme-gold-star-schema-overview.png" width="90%" alt="Representação do modelo dimensional Gold com tabelas fato e dimensão">
+</p>
+<p align="center"><em>O modelo dimensional organiza dados comerciais para consultas e relatórios. [Veja a modelagem](#modelagem-analítica).</em></p>
+
+### 3. Consultas de negócio: Trino e SQL
+
+<p align="center">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" width="90%" alt="Captura real do terminal VS Code WSL2 mostrando execução SQL no Trino, consulta nas tabelas Gold e cinco categorias com receitas e unidades vendidas">
+</p>
+<p align="center"><em>**Execução real — 27/10/2026:** consulta SQL no Trino sobre <code>lakehouse.gold.fct_sales</code> e <code>lakehouse.gold.dim_product</code>, retornando cinco categorias com receitas, descontos e unidades vendidas. Os dados são sintéticos e os valores foram formatados com duas casas decimais. [Veja a camada de consulta](#camada-de-query).</em></p>
+
+### 4. Confiabilidade: Data Quality e integração contínua
+
+| Validação dos dados | Testes automatizados |
+| --- | --- |
+| <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" width="100%" alt="Exemplo visual de relatório de validação de qualidade dos dados"> | <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" width="100%" alt="Captura real do GitHub Actions: job data-quality aprovado com geração de dados sintéticos, transformações Raw Bronze Silver Gold e testes de qualidade"> |
+| As regras permitem verificar consistência e integridade. [Entenda o Data Quality](#data-quality). | **GitHub Actions:** captura real do job de Data Quality aprovado em 27/10/2026, incluindo geração de dados, transformações e testes. [Ver execução #38](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/runs/40562636249). |
+
+**Sobre as imagens:** o [guia de capturas](assets/screenshots/readme/README.md) explica a procedência conhecida de cada painel. Em particular, o [gerador de screenshots](scripts/capture_readme_screenshots.cjs) possui exemplos predefinidos para o painel SQL e status estáticos no painel de serviços. Esses elementos não devem ser interpretados como comprovação de uma execução em tempo real.
+
+## Projetos complementares
+
+O laboratório concentra-se em **Engenharia de Dados**, incluindo construção de pipelines, transformação, qualidade e consumo analítico. Outros projetos do [portfólio GitHub](https://github.com/brodyandre) exploram aplicações complementares dessas competências, como automação e governança com IA.
+
+**Para recrutadores:** até aqui estão o contexto, as entregas e os componentes visuais. **Para pessoas técnicas:** a documentação a seguir detalha implementação, escolhas arquiteturais, comandos e limitações.
+
+---
 
 <a id="índice"></a>
 
-## Índice
+<details>
+<summary><strong>Índice técnico completo — abrir se quiser explorar a implementação</strong></summary>
+
+
 
 - [Visão Geral](#visão-geral)
 - [Objetivo do Projeto](#objetivo-do-projeto)
@@ -38,6 +140,8 @@ Laboratório técnico, local e gratuito, voltado para portfólio de Engenharia d
 - [Limitações](#limitações)
 - [Próximos Passos](#próximos-passos)
 - [Como Este Projeto Simula AWS Sem Custo](#como-este-projeto-simula-aws-sem-custo)
+
+</details>
 
 <a id="visão-geral"></a>
 
@@ -227,9 +331,11 @@ docker exec lakehouse-trino trino --execute 'SELECT * FROM lakehouse.analytics.r
 ```
 
 <p align="center">
-  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" alt="Consulta validada da camada analytics via Trino sobre o catálogo DuckDB local" width="100%">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" alt="Captura real de consulta SQL no Trino sobre tabelas Gold, exibindo cinco categorias, receita líquida, receita bruta, descontos e unidades vendidas" width="100%">
 </p>
-<p align="center"><em>Camada de query exposta via Trino sobre o catálogo DuckDB local, já validada com consultas reais.</em></p>
+<p align="center"><em>Captura real realizada em 27/10/2026 no VS Code com WSL2. A query apresentada consulta diretamente as tabelas Gold pelo Trino, e não a tabela materializada <code>analytics.revenue_by_category</code>. A saída utiliza dados sintéticos e arredondamento de valores monetários para exibição.</em></p>
+
+**Observação de versão:** no ambiente local usado para esta captura, o catálogo <code>analytics.revenue_by_category</code> tinha quatro colunas, enquanto o SQL atualmente versionado prevê cinco (incluindo <code>units_sold</code>). Por isso a evidência foi produzida com uma consulta de leitura sobre as tabelas Gold, sem atualizar nem sobrescrever o arquivo DuckDB antigo.
 
 [⬆️ Voltar ao índice](#índice)
 
@@ -322,7 +428,7 @@ Mais detalhes em [docs/observability.md](docs/observability.md).
 <p align="center">
   <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" alt="Painel de observabilidade com resumo e métricas das últimas execuções do pipeline local" width="100%">
 </p>
-<p align="center"><em>Resumo operacional das últimas execuções com status, duração, volumes processados, inválidos e artefatos gerados por job.</em></p>
+<p align="center"><em>Painel de apresentação de métricas operacionais; usa o relatório local quando disponível e pode recorrer a valores substitutos na ausência desse relatório.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -397,9 +503,9 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 - `Makefile` para padronizar comandos recorrentes.
 
 <p align="center">
-  <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
+  <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Evidência real da execução de Data Quality no GitHub Actions com passos de preparação, Raw Bronze Silver Gold e testes aprovados" width="100%">
 </p>
-<p align="center"><em>Exemplo de execução bem-sucedida de um workflow de validação no GitHub Actions.</em></p>
+<p align="center"><em>**Evidência real — 27/10/2026:** job <code>data-quality</code> da [execução #38](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/runs/40562636249), concluído com sucesso na PR #6. A captura mostra o processamento reduzido com dados sintéticos e os checks de Data Quality aprovados.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -497,7 +603,7 @@ Credenciais locais padrão:
 <p align="center">
   <img src="assets/screenshots/readme/runtime/08-readme-local-services-overview.png" alt="Serviços locais do laboratório em execução" width="100%">
 </p>
-<p align="center"><em>Exemplo da stack local com Airflow 3, Spark Connect, MinIO e Trino ativos.</em></p>
+<p align="center"><em>Ilustração dos serviços do laboratório. O status 'healthy' exibido no painel é predefinido no gerador e não comprova a disponibilidade atual dos serviços.</em></p>
 
 
 ### Executando o pipeline por etapas
@@ -567,9 +673,9 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 5. acione uma execução manual.
 
 <p align="center">
-  <img src="assets/screenshots/readme/orchestration/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
+  <img src="assets/screenshots/readme/orchestration/09-readme-airflow-run-success.png" alt="Execução histórica real do Airflow: DAG lakehouse_pipeline_dag com oito tarefas concluídas em 3 e 4 de junho de 2026" width="100%">
 </p>
-<p align="center"><em>Execução da DAG com tasks concluídas com sucesso.</em></p>
+<p align="center"><em>**Execução histórica real — 03 a 04/06/2026:** run <code>manual__2026-06-04T00:00:00+00:00</code>, com status <strong>Sucesso</strong> e oito tarefas concluídas (duração: 19h54min45s). A execução pertence ao histórico da versão <code>v1</code> da DAG e não comprova a execução da etapa <code>prepare_query_serving</code>, presente na versão <code>v2</code> exibida atualmente na interface.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
@@ -757,51 +863,9 @@ Ao executar o laboratório, espera-se gerar evidências técnicas como:
 - histórico de execução e dependências no Airflow;
 - validações automatizadas no GitHub Actions.
 
-### Guia para Inserção de Screenshots
+### Como comprovar e atualizar as evidências visuais
 
-Para enriquecer o README sem poluir a narrativa, o ideal é usar de `6` a `10` capturas principais, sempre em `PNG`, com largura consistente e foco em uma mensagem por imagem.
-
-Pasta recomendada:
-
-- `assets/screenshots/readme/`
-
-Hierarquia sugerida:
-
-```text
-assets/screenshots/readme/
-├── architecture/
-├── cicd/
-├── data-quality/
-├── finops/
-├── modeling/
-├── observability/
-├── orchestration/
-├── query/
-└── runtime/
-```
-
-Ordem sugerida de arquivos:
-
-| Ordem | Arquivo sugerido | Onde inserir | Objetivo visual |
-| --- | --- | --- | --- |
-| 1 | `architecture/01-readme-architecture-overview.png` | `Arquitetura` | Mostrar visão sistêmica do laboratório |
-| 2 | `modeling/02-readme-gold-star-schema-overview.png` | `Modelagem Analítica` | Evidenciar fatos e dimensões |
-| 3 | `data-quality/03-readme-data-quality-report.png` | `Data Quality` | Mostrar regras e evidências de qualidade |
-| 4 | `observability/04-readme-observability-metrics.png` | `Observabilidade` | Mostrar métricas operacionais |
-| 5 | `finops/05-readme-finops-cost-estimation.png` | `FinOps` | Mostrar custo simulado e small files |
-| 6 | `orchestration/06-readme-airflow-dag.png` | `Orquestração com Airflow` | Mostrar resumo operacional da DAG e status da execução |
-| 7 | `cicd/07-readme-github-actions-workflows.png` | `CI/CD com GitHub Actions` | Mostrar os checks do repositório |
-| 8 | `runtime/08-readme-local-services-overview.png` | `Como Executar Localmente` | Mostrar a stack local ativa |
-| 9 | `orchestration/09-readme-airflow-run-success.png` | `Como Executar Localmente` | Mostrar uma execução bem-sucedida com tasks concluídas |
-| 10 | `query/10-readme-trino-query-serving.png` | `Camada de Query` | Mostrar a camada analítica publicada via Trino |
-
-Como usar:
-
-1. capture a tela com foco em legibilidade;
-2. recorte bordas e elementos irrelevantes;
-3. salve o arquivo com o nome sugerido dentro da subpasta temática correspondente;
-4. ajuste o `src` da imagem no README quando trocar o arquivo ou adicionar uma nova evidência;
-5. mantenha nomes previsíveis para facilitar manutenção e navegação no GitHub.
+As imagens desta página já estão versionadas em [`assets/screenshots/readme/`](assets/screenshots/readme/). O [guia de imagens](assets/screenshots/readme/README.md) diferencia capturas de tela de painéis demonstrativos. Ao atualizar a vitrine, priorize capturas com identificação de data/execução e links verificáveis (DAG do Airflow, execução do GitHub Actions, saída de SQL e relatórios gerados). Evite reproduzir como prova de disponibilidade os estados e as tabelas ilustrativos do script de captura.
 
 [⬆️ Voltar ao índice](#índice)
 
