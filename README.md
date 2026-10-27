@@ -673,9 +673,9 @@ python3 spark/benchmarks/spark_optimization_benchmark.py \
 5. acione uma execução manual.
 
 <p align="center">
-  <img src="assets/screenshots/readme/orchestration/09-readme-airflow-run-success.png" alt="Execução bem-sucedida da DAG no Airflow local" width="100%">
+  <img src="assets/screenshots/readme/orchestration/09-readme-airflow-run-success.png" alt="Execução histórica real do Airflow: DAG lakehouse_pipeline_dag com oito tarefas concluídas em 3 e 4 de junho de 2026" width="100%">
 </p>
-<p align="center"><em>Execução da DAG com tasks concluídas com sucesso.</em></p>
+<p align="center"><em>**Execução histórica real — 03 a 04/06/2026:** run <code>manual__2026-06-04T00:00:00+00:00</code>, com status <strong>Sucesso</strong> e oito tarefas concluídas (duração: 19h54min45s). A execução pertence ao histórico da versão <code>v1</code> da DAG e não comprova a execução da etapa <code>prepare_query_serving</code>, presente na versão <code>v2</code> exibida atualmente na interface.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
