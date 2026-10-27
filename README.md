@@ -98,11 +98,9 @@ As imagens abaixo ajudam a visualizar os componentes do projeto. **Algumas são 
 
 **Sobre as imagens:** o [guia de capturas](assets/screenshots/readme/README.md) explica a procedência conhecida de cada painel. Em particular, o [gerador de screenshots](scripts/capture_readme_screenshots.cjs) possui exemplos predefinidos para o painel SQL e status estáticos no painel de serviços. Esses elementos não devem ser interpretados como comprovação de uma execução em tempo real.
 
-## Investigações de confiabilidade e projeto complementar
+## Projetos complementares
 
-Além de implementar o pipeline, foram documentadas duas investigações sobre **dados sintéticos**: a [DE-101](docs/incidents/de-101-raw-silver-divergence.md), sobre rastreabilidade de registros entre Silver e Gold, e a [DE-102](docs/incidents/de-102-analytics-revenue-status.md), sobre o significado da métrica de receita. Esses documentos permanecem aqui porque registram evidências e decisões diretamente ligadas ao Lakehouse.
-
-Os cenários derivados dessas investigações são apresentados com maior profundidade no projeto independente **[AI Data Governance Agent](https://github.com/brodyandre/ai-data-governance-agent#cenarios)**, que demonstra análise estruturada de incidentes, rastreabilidade de evidências e revisão humana. **Não há alegação de integração automática ou em tempo real entre os dois repositórios.**
+O laboratório concentra-se em **Engenharia de Dados**, incluindo construção de pipelines, transformação, qualidade e consumo analítico. Outros projetos do [portfólio GitHub](https://github.com/brodyandre) exploram aplicações complementares dessas competências, como automação e governança com IA.
 
 **Para recrutadores:** até aqui estão o contexto, as entregas e os componentes visuais. **Para pessoas técnicas:** a documentação a seguir detalha implementação, escolhas arquiteturais, comandos e limitações.
 
