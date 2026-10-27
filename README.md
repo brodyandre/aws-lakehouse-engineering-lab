@@ -93,8 +93,8 @@ As imagens abaixo ajudam a visualizar os componentes do projeto. **Algumas são 
 
 | Validação dos dados | Testes automatizados |
 | --- | --- |
-| <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" width="100%" alt="Exemplo visual de relatório de validação de qualidade dos dados"> | <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" width="100%" alt="Captura visual dos workflows de validação no GitHub Actions"> |
-| As regras permitem verificar consistência e integridade. [Entenda o Data Quality](#data-quality). | As validações ficam disponíveis para inspeção no [GitHub Actions](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions). |
+| <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" width="100%" alt="Exemplo visual de relatório de validação de qualidade dos dados"> | <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" width="100%" alt="Captura real do GitHub Actions: job data-quality aprovado com geração de dados sintéticos, transformações Raw Bronze Silver Gold e testes de qualidade"> |
+| As regras permitem verificar consistência e integridade. [Entenda o Data Quality](#data-quality). | **GitHub Actions:** captura real do job de Data Quality aprovado em 27/10/2026, incluindo geração de dados, transformações e testes. [Ver execução #38](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/runs/40562636249). |
 
 **Sobre as imagens:** o [guia de capturas](assets/screenshots/readme/README.md) explica a procedência conhecida de cada painel. Em particular, o [gerador de screenshots](scripts/capture_readme_screenshots.cjs) possui exemplos predefinidos para o painel SQL e status estáticos no painel de serviços. Esses elementos não devem ser interpretados como comprovação de uma execução em tempo real.
 
@@ -503,9 +503,9 @@ Além da automação, o projeto registra decisões e troubleshooting em artefato
 - `Makefile` para padronizar comandos recorrentes.
 
 <p align="center">
-  <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Workflows do GitHub Actions executando validações do projeto" width="100%">
+  <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" alt="Evidência real da execução de Data Quality no GitHub Actions com passos de preparação, Raw Bronze Silver Gold e testes aprovados" width="100%">
 </p>
-<p align="center"><em>Captura do workflow de validação; confira os resultados atuais e verificáveis no link do GitHub Actions acima.</em></p>
+<p align="center"><em>**Evidência real — 27/10/2026:** job <code>data-quality</code> da [execução #38](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/runs/40562636249), concluído com sucesso na PR #6. A captura mostra o processamento reduzido com dados sintéticos e os checks de Data Quality aprovados.</em></p>
 
 
 [⬆️ Voltar ao índice](#índice)
