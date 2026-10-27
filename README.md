@@ -85,9 +85,9 @@ As imagens abaixo ajudam a visualizar os componentes do projeto. **Algumas são 
 ### 3. Consultas de negócio: Trino e SQL
 
 <p align="center">
-  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" width="90%" alt="Painel ilustrativo de consulta analítica SQL por categoria">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" width="90%" alt="Captura real do terminal VS Code WSL2 mostrando execução SQL no Trino, consulta nas tabelas Gold e cinco categorias com receitas e unidades vendidas">
 </p>
-<p align="center"><em>**Painel ilustrativo**, criado por script com linhas exemplificativas; não é uma captura de SQL executado ao vivo. [Veja os comandos para executar consultas reais](#camada-de-query).</em></p>
+<p align="center"><em>**Execução real — 27/10/2026:** consulta SQL no Trino sobre <code>lakehouse.gold.fct_sales</code> e <code>lakehouse.gold.dim_product</code>, retornando cinco categorias com receitas, descontos e unidades vendidas. Os dados são sintéticos e os valores foram formatados com duas casas decimais. [Veja a camada de consulta](#camada-de-query).</em></p>
 
 ### 4. Confiabilidade: Data Quality e integração contínua
 
@@ -331,9 +331,11 @@ docker exec lakehouse-trino trino --execute 'SELECT * FROM lakehouse.analytics.r
 ```
 
 <p align="center">
-  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" alt="Consulta validada da camada analytics via Trino sobre o catálogo DuckDB local" width="100%">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" alt="Captura real de consulta SQL no Trino sobre tabelas Gold, exibindo cinco categorias, receita líquida, receita bruta, descontos e unidades vendidas" width="100%">
 </p>
-<p align="center"><em>Painel ilustrativo de exploração SQL via Trino. Os valores de linhas exibidos foram definidos no gerador da imagem; consulte a seção de comandos para executar queries reais.</em></p>
+<p align="center"><em>Captura real realizada em 27/10/2026 no VS Code com WSL2. A query apresentada consulta diretamente as tabelas Gold pelo Trino, e não a tabela materializada <code>analytics.revenue_by_category</code>. A saída utiliza dados sintéticos e arredondamento de valores monetários para exibição.</em></p>
+
+**Observação de versão:** no ambiente local usado para esta captura, o catálogo <code>analytics.revenue_by_category</code> tinha quatro colunas, enquanto o SQL atualmente versionado prevê cinco (incluindo <code>units_sold</code>). Por isso a evidência foi produzida com uma consulta de leitura sobre as tabelas Gold, sem atualizar nem sobrescrever o arquivo DuckDB antigo.
 
 [⬆️ Voltar ao índice](#índice)
 
