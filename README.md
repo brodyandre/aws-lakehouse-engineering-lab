@@ -1,95 +1,110 @@
 # AWS Lakehouse Engineering Lab
 
-**Do dado bruto à informação confiável para decisões de negócio.**
+**Como transformar dados de uma operação comercial em informações confiáveis para análise — da ingestão aos relatórios.**
 
 [![Validate Python](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-python.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-python.yml)
 [![Validate YAML](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-yaml.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/validate-yaml.yml)
 [![Run Tests](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/run-tests.yml)
 [![Data Quality](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml/badge.svg)](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions/workflows/data-quality.yml)
 
-> **Um projeto de Engenharia de Dados explicado sem jargões:** imagine uma loja virtual que reúne pedidos, clientes, produtos e campanhas em sistemas diferentes. Antes de criar relatórios confiáveis, é preciso reunir, organizar e validar esses dados. Este laboratório constrói esse caminho de ponta a ponta.
+> **Para quem não é da área de tecnologia:** imagine uma empresa que precisa entender suas vendas, seus clientes e o desempenho de campanhas. Antes de produzir indicadores, ela precisa reunir os dados, corrigir inconsistências e organizar informações de diferentes fontes. Este projeto demonstra como construir esse processo de forma automatizada, verificável e reproduzível.
 
-**Este é um projeto autoral de portfólio, executado localmente com dados sintéticos.** A arquitetura é inspirada em serviços AWS, mas **não utiliza uma conta AWS, serviços cloud gerenciados ou dados reais de clientes**. O objetivo é demonstrar como a solução foi projetada, implementada, testada, analisada e documentada — sem apresentar o laboratório como experiência de produção.
+**Natureza do projeto:** laboratório autoral de Engenharia de Dados, executado localmente com **dados sintéticos**. Simula conceitos de arquitetura AWS, mas **não utiliza serviços AWS reais nem representa uma implantação corporativa em produção**.
 
-**Navegação rápida:** [Entenda o projeto](#o-projeto-em-um-minuto) · [Veja as imagens](#demonstracao-visual) · [Confira os resultados](#resultados-e-investigacoes) · [Competências](#competencias-em-pratica) · [Documentação técnica](#índice)
+**Explore em poucos minutos:** [Visão rápida](#o-projeto-em-um-minuto) · [Fluxo e arquitetura](#como-os-dados-percorrem-o-lakehouse) · [Demonstração visual](#demonstracao-visual) · [Entregas e competências](#entregas-e-competencias) · [Detalhamento técnico](#índice)
 
 <a id="o-projeto-em-um-minuto"></a>
 
 ## O projeto em um minuto
 
-| Pergunta | Resposta simples |
+| Pergunta | Resposta |
 | --- | --- |
-| **Qual problema resolve?** | Dados comerciais podem estar espalhados, inconsistentes ou incompletos, comprometendo relatórios e indicadores. |
-| **O que foi construído?** | Um processo automatizado que recebe dados simulados de e-commerce, prepara e verifica as informações e publica tabelas prontas para análise. |
-| **Como as informações são utilizadas?** | Consultas de receita por categoria e mês, desempenho de campanhas, clientes e comportamento digital. |
-| **Como saber se o resultado é confiável?** | Regras de qualidade, rastreamento de registros, relatórios operacionais, testes automatizados e investigação de possíveis inconsistências. |
-| **Qual é a infraestrutura?** | Ambiente local com Docker, PySpark, Airflow, MinIO, DuckDB, Trino e GitHub Actions; sem contratação de serviços AWS. |
+| **Qual é o problema?** | Informações de pedidos, clientes, produtos e campanhas podem estar fragmentadas ou apresentar inconsistências, dificultando análises confiáveis. |
+| **O que foi desenvolvido?** | Um pipeline que gera dados sintéticos de e-commerce, organiza registros em etapas, aplica validações e prepara tabelas para consultas comerciais. |
+| **Qual é o resultado?** | Estrutura analítica para consultar vendas por categoria e período, desempenho de campanhas, comportamento digital e clientes. |
+| **Como garantir confiança?** | Regras de qualidade, rastreabilidade, logs e métricas de execução, testes automatizados e documentação das decisões técnicas. |
+| **Quais tecnologias entram em ação?** | Python, PySpark, SQL, Airflow, MinIO, Parquet, DuckDB, Trino, Docker e GitHub Actions. |
 
-### O caminho que os dados percorrem
+<a id="como-os-dados-percorrem-o-lakehouse"></a>
 
-**Dados de pedidos e clientes** → **organização** → **validação** → **informações para decisões comerciais**.
+## Como os dados percorrem o Lakehouse
 
-No vocabulário da Engenharia de Dados, essas etapas são organizadas nas camadas **Raw → Bronze → Silver → Gold**. Para entender a ideia, não é necessário conhecer as ferramentas: os dados entram como foram recebidos e passam por etapas de preparação até estarem adequados à análise.
+**Dados de origem → preparação → verificação de qualidade → tabelas analíticas → consultas de negócio.**
 
-<p align="center">
-  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" width="100%" alt="Diagrama da arquitetura do laboratório: origem dos dados, preparação em camadas, validação e consultas analíticas">
-</p>
-<p align="center"><em>Mapa visual do processo completo. Trata-se de uma arquitetura de laboratório, e não de infraestrutura AWS implantada em produção.</em></p>
+O processo é organizado em quatro camadas, com funções distintas:
 
-<a id="resultados-e-investigacoes"></a>
-
-## Resultados e investigações: o que foi demonstrado
-
-Mais do que executar ferramentas, este repositório documenta **como conferir resultados, identificar riscos e explicar diferenças nos dados**.
-
-| Caso documentado | Evidência do laboratório | O que demonstra |
+| Etapa | O que acontece | Por que isso importa |
 | --- | --- | --- |
-| **DE-101 — Rastreabilidade dos registros** | Dos 1.000 itens analisados na Silver, 937 foram publicados na tabela de vendas Gold. As **63 exclusões** foram explicadas: 30 por quantidade inválida e 33 vinculadas a 12 pedidos com status inválido. | Investigação de causa raiz, validação das transformações e explicação de perdas aparentes sem atribuir falhas inexistentes. |
-| **DE-102 — Significado dos indicadores de receita** | O total publicado na camada analítica foi conciliado com a Gold (**R$ 1.416.127,23**). Um cenário *hipotético*, considerando apenas pedidos pagos ou enviados, resultou em **R$ 548.323,22**. | Capacidade de identificar risco de interpretação de métricas e solicitar uma definição de negócio antes de modificar o processamento. |
-| **Testes de qualidade** | Na investigação DE-101, **15 verificações automatizadas** passaram, mesmo havendo registros de origem sinalizados como inválidos. | Entendimento de que validar o *tratamento* dos dados não é o mesmo que afirmar que toda a entrada está livre de erros. |
-
-**Importante:** os números acima são resultados de investigações documentadas sobre **dados sintéticos**, não indicadores de uma empresa real. No DE-102, a diferença entre cenários **não comprova erro de receita**: a regra de reconhecimento de receita ainda precisa de definição formal.
-
-**Leia as análises completas:** [DE-101 — divergência entre camadas](docs/incidents/de-101-raw-silver-divergence.md) · [DE-102 — semântica de receita](docs/incidents/de-102-analytics-revenue-status.md).
-
-### Entenda o diagnóstico DE-101 em uma imagem
+| **Raw** | Recepção dos dados sintéticos em seu formato de origem. | Mantém uma referência para conferências. |
+| **Bronze** | Organização estrutural e gravação em formato apropriado ao processamento. | Padroniza a entrada e preserva rastreabilidade. |
+| **Silver** | Tratamento de tipos, regras de negócio e sinalização de registros inválidos. | Permite identificar problemas antes da análise. |
+| **Gold** | Publicação das tabelas de fatos e dimensões voltadas ao consumo analítico. | Facilita responder perguntas sobre vendas, clientes e campanhas. |
 
 <p align="center">
-  <img src="assets/diagrams/de-101-data-funnel.svg" width="100%" alt="Funil documentado: 1.000 itens Silver; menos 30 com quantidade inválida, restam 970; menos 33 associados a pedidos inválidos, restam 937 na Gold">
+  <img src="assets/screenshots/readme/architecture/01-readme-architecture-overview.png" width="100%" alt="Diagrama de arquitetura do laboratório: origem de dados, camadas Raw, Bronze, Silver e Gold, Airflow, Spark, qualidade e consumo analítico">
 </p>
-<p align="center"><em>Visualização construída a partir do relatório de investigação DE-101. É um gráfico explicativo, não uma captura de execução em tempo real.</em></p>
+<p align="center"><em>Visão arquitetural do laboratório. O diagrama representa o desenho local da solução, não serviços AWS em produção.</em></p>
+
+<a id="entregas-e-competencias"></a>
+
+## Entregas e competências demonstradas
+
+Em vez de apenas listar tecnologias, estes componentes permitem localizar **o que está implementado e onde conferir o código ou a documentação**:
+
+| Entrega verificável | Competência evidenciada | Onde conferir |
+| --- | --- | --- |
+| **4 camadas de dados:** Raw, Bronze, Silver e Gold | Ingestão, transformação, modelagem e organização do ciclo de vida dos dados | [Jobs PySpark](spark/jobs/) |
+| **Modelo analítico:** 4 dimensões e 2 fatos | Modelagem dimensional e preparação de informações para análise | [Documentação do modelo](docs/data-modeling.md) |
+| **5 consultas analíticas:** receita, campanhas, canais, clientes e evolução mensal | SQL e entrega de dados para consumidores analíticos | [Consultas SQL](sql/analytics/) |
+| **DAG do Airflow e infraestrutura local modular** | Orquestração, dependências de execução e operação com containers | [DAG](airflow/dags/lakehouse_pipeline_dag.py) · [Docker Compose](compose/) |
+| **Testes, Data Quality, observabilidade e FinOps simulado** | Confiabilidade, acompanhamento operacional e atenção à eficiência | [Testes](tests/) · [Documentação](docs/) |
+| **4 workflows de GitHub Actions** | Integração contínua, automatização de validações e boas práticas de versionamento | [Workflows](.github/workflows/) · [Execuções públicas](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions) |
+
+*Os quantitativos descrevem artefatos existentes no código, não indicadores de desempenho medidos em ambiente de produção.*
 
 <a id="demonstracao-visual"></a>
 
-## Demonstração visual do projeto
+## Demonstração visual
 
-Estas imagens ajudam a reconhecer o que foi desenvolvido. Algumas são capturas de interfaces e outras são **painéis de apresentação gerados por script**. Uma imagem ilustrativa, isoladamente, não comprova que todos os serviços estavam saudáveis naquele instante; para conferir a execução, consulte o histórico do [GitHub Actions](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions), os [relatórios](reports/) e as [investigações](docs/incidents/).
+As imagens abaixo ajudam a visualizar os componentes do projeto. **Algumas são capturas de interfaces; outras são painéis demonstrativos**. Para conferir o comportamento real, utilize também os códigos, comandos e relatórios vinculados.
 
-| Orquestração dos processos | Qualidade dos dados |
+### 1. Automação do pipeline: Apache Airflow
+
+<p align="center">
+  <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" width="90%" alt="Interface Airflow do laboratório com a DAG de processamento de dados">
+</p>
+<p align="center"><em>A DAG organiza as dependências entre ingestão, preparação, qualidade e publicação. [Conheça a implementação](#orquestração-com-airflow).</em></p>
+
+### 2. Dados preparados para a análise: modelo Gold
+
+<p align="center">
+  <img src="assets/screenshots/readme/modeling/02-readme-gold-star-schema-overview.png" width="90%" alt="Representação do modelo dimensional Gold com tabelas fato e dimensão">
+</p>
+<p align="center"><em>O modelo dimensional organiza dados comerciais para consultas e relatórios. [Veja a modelagem](#modelagem-analítica).</em></p>
+
+### 3. Consultas de negócio: Trino e SQL
+
+<p align="center">
+  <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" width="90%" alt="Painel ilustrativo de consulta analítica SQL por categoria">
+</p>
+<p align="center"><em>**Painel ilustrativo**, criado por script com linhas exemplificativas; não é uma captura de SQL executado ao vivo. [Veja os comandos para executar consultas reais](#camada-de-query).</em></p>
+
+### 4. Confiabilidade: Data Quality e integração contínua
+
+| Validação dos dados | Testes automatizados |
 | --- | --- |
-| <img src="assets/screenshots/readme/orchestration/06-readme-airflow-dag.png" width="100%" alt="Captura da interface da DAG do Airflow do laboratório"> | <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" width="100%" alt="Exemplo visual de relatório de Data Quality do laboratório"> |
-| **Airflow:** organiza as etapas e permite acompanhar as tarefas de processamento. [Como funciona](#orquestração-com-airflow). | **Data Quality:** verifica regras de integridade e consistência antes do consumo analítico. [Ver controles](#data-quality). |
+| <img src="assets/screenshots/readme/data-quality/03-readme-data-quality-report.png" width="100%" alt="Exemplo visual de relatório de validação de qualidade dos dados"> | <img src="assets/screenshots/readme/cicd/07-readme-github-actions-workflows.png" width="100%" alt="Captura visual dos workflows de validação no GitHub Actions"> |
+| As regras permitem verificar consistência e integridade. [Entenda o Data Quality](#data-quality). | As validações ficam disponíveis para inspeção no [GitHub Actions](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions). |
 
-| Acompanhamento operacional | Consulta dos resultados |
-| --- | --- |
-| <img src="assets/screenshots/readme/observability/04-readme-observability-metrics.png" width="100%" alt="Painel demonstrativo de métricas e estado das execuções"> | <img src="assets/screenshots/readme/query/10-readme-trino-query-serving.png" width="100%" alt="Painel ilustrativo de consultas SQL por categoria do e-commerce"> |
-| **Observabilidade:** exemplo de visualização de execuções; pode usar dados substitutos quando não há relatório local. [Ver detalhes](#observabilidade). | **Consultas SQL:** painel demonstrativo com valores predefinidos; não é uma captura de query ao vivo. [Como consultar de verdade](#camada-de-query). |
+**Sobre as imagens:** o [guia de capturas](assets/screenshots/readme/README.md) explica a procedência conhecida de cada painel. Em particular, o [gerador de screenshots](scripts/capture_readme_screenshots.cjs) possui exemplos predefinidos para o painel SQL e status estáticos no painel de serviços. Esses elementos não devem ser interpretados como comprovação de uma execução em tempo real.
 
-> **Transparência das imagens:** o gerador [`scripts/capture_readme_screenshots.cjs`](scripts/capture_readme_screenshots.cjs) monta os painéis de observabilidade, serviços e consultas em HTML antes de fotografá-los com Playwright. O painel de serviços usa status *healthy* estático, e o de consultas contém linhas exemplificativas no código. Para novas provas operacionais, a preferência é capturar a interface real e publicar junto com data, comando e artefato de origem. Veja o [guia das imagens](assets/screenshots/readme/README.md).
+## Investigações de confiabilidade e projeto complementar
 
-<a id="competencias-em-pratica"></a>
+Além de implementar o pipeline, foram documentadas duas investigações sobre **dados sintéticos**: a [DE-101](docs/incidents/de-101-raw-silver-divergence.md), sobre rastreabilidade de registros entre Silver e Gold, e a [DE-102](docs/incidents/de-102-analytics-revenue-status.md), sobre o significado da métrica de receita. Esses documentos permanecem aqui porque registram evidências e decisões diretamente ligadas ao Lakehouse.
 
-## Competências demonstradas na prática
+Os cenários derivados dessas investigações são apresentados com maior profundidade no projeto independente **[AI Data Governance Agent](https://github.com/brodyandre/ai-data-governance-agent#cenarios)**, que demonstra análise estruturada de incidentes, rastreabilidade de evidências e revisão humana. **Não há alegação de integração automática ou em tempo real entre os dois repositórios.**
 
-| Competência | Aplicação neste portfólio |
-| --- | --- |
-| **Construção de pipelines de dados** | Processo completo de entrada, transformação, organização e publicação de dados de e-commerce. |
-| **Python, SQL e PySpark** | Automação do processamento, regras de transformação e consultas analíticas. |
-| **Qualidade e governança** | Validações, sinalização de dados inválidos, investigação DE-101 e discussão de regras de negócio no DE-102. |
-| **Automação e operação** | Orquestração no Airflow, testes no GitHub Actions, relatórios operacionais e diagnóstico de falhas. |
-| **Arquitetura e eficiência** | Serviços locais que representam conceitos de cloud, modelagem para análise e simulação de custos (FinOps). |
-
-**Para recrutadores e gestores:** as seções acima mostram o problema, as entregas e as evidências. **Para pessoas técnicas:** o restante do README detalha arquitetura, decisões, código, execução e limitações. É possível aprofundar cada ponto pelos links apresentados.
+**Para recrutadores:** até aqui estão o contexto, as entregas e os componentes visuais. **Para pessoas técnicas:** a documentação a seguir detalha implementação, escolhas arquiteturais, comandos e limitações.
 
 ---
 
