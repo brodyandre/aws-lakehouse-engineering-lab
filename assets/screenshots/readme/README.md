@@ -1,12 +1,37 @@
-# Screenshots do README
+# Guia das imagens do README
 
-Esta pasta organiza as capturas usadas no `README.md` por tema, para facilitar manutenção local e navegação no GitHub.
+As imagens desta pasta ajudam a apresentar o laboratório de Engenharia de Dados no GitHub. **Uma imagem bonita não equivale, por si só, à evidência de uma execução real.** Este guia identifica o que pode ser confirmado e como substituir imagens demonstrativas por capturas verificáveis.
 
-## Estrutura
+## Tipos de imagem
+
+| Imagem | Origem conhecida | Cuidados de interpretação |
+| --- | --- | --- |
+| `architecture/01-readme-architecture-overview.png` | Diagrama de arquitetura publicado no projeto | Explica o desenho da solução; não representa implantação cloud real. |
+| `orchestration/06-readme-airflow-dag.png` | O script `scripts/capture_readme_screenshots.cjs` tenta acessar a interface real do Airflow e capturá-la | Conferir se a imagem mostra a DAG e a execução pretendida; a captura não valida automaticamente o estado das tarefas. |
+| `observability/04-readme-observability-metrics.png` | Painel HTML gerado a partir de `reports/observability/pipeline_metrics.json` quando disponível | O script contém valores substitutos; validar a existência e a data do relatório de origem. |
+| `query/10-readme-trino-query-serving.png` | Painel HTML gerado por Playwright | As linhas de resultado são **predefinidas no código**; não são resultado de uma consulta SQL capturada ao vivo. |
+| `runtime/08-readme-local-services-overview.png` | Painel HTML gerado por Playwright | Todos os status `healthy` estão **predefinidos no código**; não são uma checagem atual de saúde dos serviços. |
+| Demais imagens (`modeling`, `data-quality`, `finops`, `cicd`, `orchestration/09`) | Arquivos PNG versionados no repositório | A origem exata da captura não foi estabelecida por este gerador. Evitar afirmar resultado operacional sem verificar a tela e o artefato correspondente. |
+
+## Como produzir evidências verificáveis
+
+1. Rode o pipeline, os testes ou a consulta no ambiente local conforme o [README principal](../../../README.md).
+2. Capture a **interface ou saída efetiva** (Airflow, Trino, terminal, relatórios ou GitHub Actions); não use um painel estático como comprovação de saúde dos serviços.
+3. Inclua na legenda o sistema, a data da execução, o comando ou a identificação do run, além do link para a evidência de origem quando possível.
+4. Oculte tokens, senhas, URLs sensíveis e dados pessoais antes de publicar.
+5. Mantenha arquivos legíveis, sem recortes que removam informações essenciais para interpretar a imagem.
+
+### Fontes de evidência que acompanham o código
+
+- [Relatório de diagnóstico DE-101](../../../docs/incidents/de-101-raw-silver-divergence.md): explica a diferença entre 1.000 itens Silver e 937 linhas Gold.
+- [Relatório de diagnóstico DE-102](../../../docs/incidents/de-102-analytics-revenue-status.md): analisa o risco de interpretação da métrica de receita.
+- [Workflows GitHub Actions](https://github.com/brodyandre/aws-lakehouse-engineering-lab/actions): resultados públicos de execução dos checks.
+- `reports/data_quality/`, `reports/observability/`, `reports/finops/` e `reports/query/`: relatórios gerados localmente, não necessariamente versionados.
+
+## Organização
 
 ```text
 assets/screenshots/readme/
-├── archive/
 ├── architecture/
 ├── cicd/
 ├── data-quality/
@@ -15,25 +40,8 @@ assets/screenshots/readme/
 ├── observability/
 ├── orchestration/
 ├── query/
-└── runtime/
+├── runtime/
+└── README.md
 ```
 
-## Convenção
-
-- `architecture/`: visão geral da arquitetura do laboratório.
-- `modeling/`: camada `Gold` e modelagem analítica.
-- `data-quality/`: relatórios e evidências de qualidade.
-- `observability/`: métricas operacionais e monitoramento.
-- `finops/`: relatórios de custo simulado.
-- `orchestration/`: DAG do Airflow e execuções do pipeline.
-- `cicd/`: workflows e checks do GitHub Actions.
-- `query/`: evidências da camada de serving e exploração SQL via Trino.
-- `runtime/`: stack local e serviços em execução.
-- `archive/`: versões anteriores preservadas automaticamente antes de uma nova captura sobrescrever o nome principal.
-
-## Boas práticas
-
-- manter nomes numerados para preservar a ordem narrativa do `README`;
-- usar `PNG` com recorte limpo e boa legibilidade;
-- ao regenerar imagens com `scripts/capture_readme_screenshots.cjs`, os arquivos anteriores são movidos para `archive/`;
-- atualizar o `README.md` sempre que um arquivo for movido ou renomeado.
+**Nota de manutenção:** o script `scripts/capture_readme_screenshots.cjs` pode criar `archive/` para preservar versões anteriores antes de sobrescrever imagens. Reveja sempre conteúdo, data e legenda após regenerar imagens.
